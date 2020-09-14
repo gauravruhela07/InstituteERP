@@ -1,9 +1,11 @@
 import React from 'react';
 
-const Admin = () => {
+const Faculty = () => {
     return (
         <div>
             This is faculty page!
         </div>
-    )
-}
+    );
+};
+
+export default Faculty;
