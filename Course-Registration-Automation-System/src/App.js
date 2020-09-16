@@ -2,6 +2,7 @@ import React from 'react';
 import { BrowserRouter as Router, Route} from "react-router-dom";
 import './App.css';
 
+// components
 import Student from './components/Student/student';
 import Admin from './components/Admin/admin';
 import Faculty from './components/Faculty/faculty';
