@@ -19,9 +19,11 @@ connection.once('open', () => {
 });
 
 // Adding routers for the DB models
-const courseRouter = require('./routes/course');
+const courseRouter = require('./routes/admin/course');
+const studentRouter = require('./routes/student/student_login_signup');
 
 app.use('/course', courseRouter);
+app.use('/student', studentRouter);
 
 app.listen(port, () => {
     console.log(`Server is running on port: ${port}`);

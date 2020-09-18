@@ -1,16 +1,20 @@
 const router = require('express').Router();
+const checkAuth = require('../../middleware/check_auth_admin');
 
-let Course = require('../models/course.model')
+let Course = require('../../models/course.model')
+
 
 // Inserting subjects into the database
-router.route('/add').post((req, res) => {
+// checkAuth will check whether admin-client has sent valid token or not
+router.post('/add', checkAuth, (req, res) => {
+    // console.log(req);
     const semester_num = req.body.semester_num;
     const course_id = req.body.course_id;
     const course_name = req.body.course_name;
     const department = req.body.department;
     const elective = req.body.elective;
     
-    // console.log(req);
+    
     var newCourse = new Course({
         semester_num,
         course_id,
