@@ -6,7 +6,7 @@ const jwt = require('jsonwebtoken');
 
 // in this file student while logging in will generate jwt token for authrized access to some apis.
 var salt = 7;
-var secret_key = 'secret_student';
+var secret_key = 'secret_key_student';
 
 const Student = require('../../models/student.model');
 
