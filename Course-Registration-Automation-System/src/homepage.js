@@ -6,7 +6,7 @@ const HomePage = () => {
     return (
         <div>
             <h1>This Is HomePage</h1>
-            <Button href='/student'>Student</Button>
+            <Button href='/student/login'>Student</Button>
             <br></br>
             <Button href='/admin'>Admin</Button>
             <br></br>

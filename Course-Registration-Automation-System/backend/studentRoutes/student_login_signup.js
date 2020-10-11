@@ -8,7 +8,7 @@ const jwt = require('jsonwebtoken');
 var salt = 7;
 var secret_key = 'secret_key_student';
 
-const Student = require('../../models/student.model');
+const Student = require('../models/student.model');
 
 router.post('/signup', (req, res, next) => {
 
@@ -33,7 +33,8 @@ router.post('/signup', (req, res, next) => {
                         email: req.body.email,
                         password: hash,
                         name: req.body.name,
-                        department: req.body.department
+                        department: req.body.department,
+                        roll_num: req.body.roll_num
                     });
                     student.save().then(result => {
                         // console.log(result)
@@ -41,7 +42,7 @@ router.post('/signup', (req, res, next) => {
                             message: 'Student Added'
                         });
                     }).catch(err => {
-                        console.log(err);
+                        // console.log(err);
                         res.status(500).json({
                             error: err
                         });
@@ -54,6 +55,7 @@ router.post('/signup', (req, res, next) => {
 });
 
 router.post('/login', (req, res, next) => {
+    // console.log(req);
     Student.find({email: req.body.email})
     .exec()
     .then(student => {
@@ -64,7 +66,7 @@ router.post('/login', (req, res, next) => {
         }
         bcrypt.compare(req.body.password, student[0].password, (err, result) => {
             if (err) {
-                return res.status(401).json({
+                return res.json({
                     message: "Auth Failed"
                 });
             }
@@ -82,15 +84,14 @@ router.post('/login', (req, res, next) => {
                     token: token
                 });
             }
-            if(err.length<1 && result.length<1){
-                res.status(401).json({
+            
+                res.json({
                     message: 'Auth Failed',
                 });
-            }
         });
     })
     .catch(err => {
-        console.log(err);
+        // console.log(err);
         res.status(500).json({
             error: err
         });
@@ -113,7 +114,7 @@ router.delete('/:studentId', (req, res, next) => {
         }
     })
     .catch(err => {
-        console.log(err);
+        // console.log(err);
         res.status(500).json({
             error: err
         });

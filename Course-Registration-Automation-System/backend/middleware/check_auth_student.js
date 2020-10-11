@@ -1,6 +1,6 @@
 const jwt = require('jsonwebtoken');
 
-var secret_key = 'secret_key_admin';
+var secret_key = 'secret_key_student';
 
 module.exports = (req, res, next) => {
     try{
