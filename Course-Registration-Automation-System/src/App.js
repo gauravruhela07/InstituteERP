@@ -1,7 +1,6 @@
 import React from 'react';
 import { BrowserRouter, Route, Switch } from "react-router-dom";
 import './App.css';
-import { ProtectedRoute } from './protected.route';
 
 // components
 import Admin from './components/Admin/admin';
