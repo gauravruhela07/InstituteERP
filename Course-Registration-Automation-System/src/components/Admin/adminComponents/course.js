@@ -1,85 +1,135 @@
-import React, {Component} from 'react';
-import {Link} from "react-router-dom";
-import {render} from 'react-dom';
+import React, { Component } from "react";
+import { useState } from "react";
+import axios from 'axios';
+import { Link } from "react-router-dom";
+import { render } from "react-dom";
 
-export default class Course extends Component
-{
-	constructor(props)
-	{
-		super(props);
+const Course = () => {
+  // var selectedSemester;
+  const [selectedSemester, setselectedSemester] = useState(-1);
+  const [allCourses, setallCourses] = useState([]);
+  const [newCourses, setnewCourses] = useState([]);
+  const [inputList, setInputList] = useState([]);
 
-		// this will add a new course, and then open another drop down for adding other course
-		this.onAdditionOfCourse = this.onAdditionOfCourse.bind(this);
-		// this will make the form disappear
-		this.onSubmit = this.onSubmit.bind(this);
-		this.renderSelectBox = this.renderSelectBox.bind(this);
+  // this functions will generate the list of all the unselected courses as a select tag form.
+  const generateCourseList = () => {
+    var coursesList = [];
+    var i, courseName;
+    // console.log(newCourses);
+    // setallCourses([]);
+    // setallCourses([...newCourses]);
+    console.log("allCourses " + allCourses);
+    for (i = 0; i < newCourses.length; i++) {
+      courseName = newCourses[i];
+      coursesList.push(<option value={courseName}>{courseName}</option>);
+    }
+    return coursesList;
+  };
 
-		this.state = {
-			counter: 0,
-			prevVal: -1,
-			coursename: ''
-		}
-	}
+  const displaySemesters = () => {
+    let item = [];
+    item.push(<option value="None">None</option>);
+    item.push(<option value="1">Semester1</option>);
+    item.push(<option value="2">Semester2</option>);
+    item.push(<option value="3">Semester3</option>);
+    item.push(<option value="4">Semester4</option>);
+    item.push(<option value="5">Semester5</option>);
+    item.push(<option value="6">Semester6</option>);
+    item.push(<option value="7">Semester7</option>);
+    item.push(<option value="8">Semester8</option>);
+    return item;
+  };
 
-	createSelectedItems(){
-		let item = [];
-		item.push(<option value="os">OS</option>);
-		item.push(<option value="dbms">DBMS</option>);
-		item.push(<option value="networks">Networks</option>);
-		item.push(<option value="algo">Algo</option>);
-		return item;
-	}
+  // when one course is selected
+  // update that course's semester in the database for which the course is selected
+  // then remove the course from the array
+  const onAdditionOfCourse = (e) => {
+    // console.log(e.target.value);
+    // console.log(newCourses);
+    var selectedCourse;
+    // selectedCourse = String(e.target.value);
+    const semester = {
+      selectedCourse: String(e.target.value),
+      semester_num: selectedSemester
+    }
 
+    console.log("selectedCourse = " + selectedCourse);
+    console.log("selectedSemester = " + selectedSemester);
+    console.log("semester = " + semester);
 
-	onAdditionOfCourse(e){
-		this.setState({
-			coursename: e.target.value
-		});
-	}
-
-	renderSelectBox(){
-		if (this.state.counter!=this.state.prevVal)
-		{
-			console.log(this.state.prevVal);
-			console.log(this.state.counter);
-			this.state.prevVal = this.state.counter;
-			this.state.counter++;
-			return(
-				<div>
-					<label>Add Course </label>
-					<select value={this.state.value} onChange={this.onAdditionOfCourse}>
-						{this.createSelectedItems()}
-					</select>
-				</div>
-			);
-		}
-	}
-
-	onSubmit(e){
-
-	}
+    axios.post('http://localhost:5000/course/update/', semester)
+      .then(res => console.log("Update done"));
 
 
-	render()
-	{
-		return(
-			<div>
-				<h3>Choose the Semester</h3>
-				<button type="button" class="btn btn-primary">Semester1</button>&nbsp;&nbsp;&nbsp;
-				<button type="button" class="btn btn-primary">Semester2</button>&nbsp;&nbsp;&nbsp;
-				<button type="button" class="btn btn-primary">Semester3</button>&nbsp;&nbsp;&nbsp;
-				<button type="button" class="btn btn-primary">Semester4</button>&nbsp;&nbsp;&nbsp;
-				<button type="button" class="btn btn-primary">Semester5</button>&nbsp;&nbsp;&nbsp;
-				<button type="button" class="btn btn-primary">Semester6</button>&nbsp;&nbsp;&nbsp;
-				<button type="button" class="btn btn-primary">Semester7</button>&nbsp;&nbsp;&nbsp;
-				<button type="button" class="btn btn-primary">Semester8</button>&nbsp;&nbsp;&nbsp;
+    const index = newCourses.indexOf(String(e.target.value));
+    newCourses.splice(index, 1);
+    console.log("newCourses = ", newCourses);
+  };
 
-				<h3>Enter the courses</h3>
-				<form onSubmit = {this.onSubmit}>
-				{this.renderSelectBox()}
-				</form>
-			</div>
+  //it adds a new entry to select a new course
+  const handleAdd = () => {
+    setInputList([...inputList, -1]);
+  };
 
-			);
-	}
-}
+  const onSubmit = (e) => { };
+
+  //it handles removal of a particular course 
+  const handleRemoval = () => {
+    var lst = [...inputList];
+    lst.pop();
+    setInputList([...lst]);
+  };
+
+  // when the admin has selected a semester, display him all the courses.
+  // admin will select the courses for a particular semester
+  // selected courses will be removed from the list
+  const onSelectionOfSemester = (e) => {
+
+    axios.get('http://localhost:5000/course/')
+      .then(response => {
+        var i;
+        for (i = 0; i < response.data.length; i++) {
+          if (response.data[i].semester_num != -1) continue;
+          // allCourses.push(response.data[i].course_name);
+          //console.log(response.data[i].course_name);
+          setallCourses(allCourses.push(response.data[i].course_name));
+        }
+        console.log(allCourses);
+        setnewCourses([...allCourses]);
+      });
+    console.log(allCourses);
+
+    setselectedSemester(Number(e.target.value));
+    console.log("selectedSemester = " + selectedSemester);
+  }
+
+  return (
+    <div>
+      <form >
+        <div className="form-group">
+          <label>Select Semester</label>
+          <select className="form-control" name="semesterSelect" onChange={onSelectionOfSemester}>
+            {displaySemesters()}
+          </select>
+        </div>
+        <button type="button" class="btn btn-primary" value="Add" onClick={handleAdd}>Add Course</button>
+        {
+          inputList.map((x, i) => {
+            // console.log(x, i);
+            return (
+              <div key={i} class="form-group">
+                <label>Add Course </label>
+                <select class="form-control" name="courseSelect" onChange={onAdditionOfCourse}>
+                  {generateCourseList()}
+                </select>
+                <button type="button" class="btn btn-primary" value="Remove" onClick={handleRemoval}>Remove This Course</button>
+              </div>
+            );
+          })
+        }
+      </form>
+    </div>
+  );
+};
+
+export default Course;
