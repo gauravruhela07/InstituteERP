@@ -5,8 +5,9 @@ import "bootstrap/dist/css/bootstrap.min.css"
 
 import Navbar from "./adminComponents/navbar";
 import profile from "./adminComponents/profile";
-import course from "./adminComponents/course";
-import faculty from "./adminComponents/facultyAddCourses";
+import courseAssign from "./adminComponents/course";
+import courseAdd from "./adminComponents/adminAddCourses";
+import facultyAdd from "./adminComponents/adminAddFaculty";
 
 
 
@@ -17,8 +18,9 @@ const Admin = () => {
 				<Navbar />
 				<br />
 				<Route path='/' exact component={profile} />
-				<Route path='/course' exact component={course} />
-				<Route path='/faculty' exact component={faculty} />
+				<Route path='/courseAssign' exact component={courseAssign} />
+				<Route path='/courseAdd' exact component={courseAdd} />
+				<Route path='/facultyAdd' exact component={facultyAdd} />
 			</div>
 		</Router>
 	);

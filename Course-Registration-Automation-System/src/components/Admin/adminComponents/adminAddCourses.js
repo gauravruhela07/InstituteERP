@@ -4,7 +4,7 @@ import axios from 'axios';
 import { Link } from "react-router-dom";
 import { render } from "react-dom";
 
-const FacultyAddCourses = () => {
+const AdminAddCourses = () => {
 
     const [courseName, setcourseName] = useState();
     const [courseId, setcourseId] = useState();
@@ -84,4 +84,4 @@ const FacultyAddCourses = () => {
     );
 };
 
-export default FacultyAddCourses;
+export default AdminAddCourses;
