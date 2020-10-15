@@ -89,7 +89,7 @@ const Course = () => {
       .then(response => {
         var i;
         for (i = 0; i < response.data.length; i++) {
-          if (response.data[i].semester_num != -1) continue;
+          if (response.data[i].semester_num != "-1") continue;
           // allCourses.push(response.data[i].course_name);
           //console.log(response.data[i].course_name);
           setallCourses(allCourses.push(response.data[i].course_name));
@@ -99,7 +99,7 @@ const Course = () => {
       });
     console.log(allCourses);
 
-    setselectedSemester(Number(e.target.value));
+    setselectedSemester(String(e.target.value));
     console.log("selectedSemester = " + selectedSemester);
   }
 

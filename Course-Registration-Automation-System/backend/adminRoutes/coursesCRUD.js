@@ -51,7 +51,7 @@ router.route('/add').post((req, res) => {
     console.log(courses);
 
     courses.save()
-        .then(() => res.json('User added!'))
+        .then(() => res.json('course added!'))
         .catch(err => res.status(400).json('Error: ' + err));
 });
 
