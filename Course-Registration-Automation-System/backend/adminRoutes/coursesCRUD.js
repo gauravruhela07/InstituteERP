@@ -69,4 +69,30 @@ router.route('/update/').post((req, res) => {
     // .catch(err => res.status(400).json('Error: ' + err));
 });
 
+
+router.route('/updateElective/').post((req, res) => {
+    console.log(req.body.selectedElectives);
+    console.log(req.body.semester_num);
+    console.log(req.body.electiveNumber);
+    var i;
+    for (i = 0; i < req.body.selectedElectives.length; i++) {
+        var myquery = { course_name: req.body.selectedElectives[i] };
+        var newvalues = { $set: { semester_num: req.body.semester_num, elective: req.body.electiveNumber } };
+        Course.updateOne(myquery, newvalues, (err, res) => {
+            if (err) throw err;
+            console.log("Update Done");
+        })
+    }
+    // .then(() => console.log("Update Done"))
+    // .catch(err => res.status(400).json('Error: ' + err));
+});
+
+
+
+
+
+
+
+
+
 module.exports = router;
