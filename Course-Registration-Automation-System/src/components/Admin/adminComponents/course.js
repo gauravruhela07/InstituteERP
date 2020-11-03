@@ -205,7 +205,7 @@ const Course = () => {
   return (
     <div>
       <div>
-        <h3>Manadatory Courses Included In Semester {selectedSemester}</h3>
+        {/* <h3>Manadatory Courses Included In Semester {selectedSemester}</h3> */}
         <table className="table">
           <thead className="thead-light">
             <tr>
@@ -228,7 +228,7 @@ const Course = () => {
       </div>
 
       <div>
-        <h3>Elective Courses Included In Semester {selectedSemester}</h3>
+        {/* <h3>Elective Courses Included In Semester {selectedSemester}</h3> */}
         <table className="table">
           <thead className="thead-light">
             <tr>
