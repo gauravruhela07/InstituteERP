@@ -6,8 +6,7 @@ import { Link } from "react-router-dom";
 import { render } from "react-dom";
 
 const Course = () => {
-  // var selectedSemester;
-  const [selectedSemester, setselectedSemester] = useState(-1);
+  const [selectedSemester, setselectedSemester] = useState();
   const [allCourses, setallCourses] = useState([]);
   const [newCourses, setnewCourses] = useState([]);
   const [inputListManadatory, setInputListManadatory] = useState([-1]);
@@ -15,22 +14,9 @@ const Course = () => {
   const [lstOfElectives, setlstOfElectives] = useState([]);
   const [electiveNumber, setelectiveNumber] = useState(1);
   const [flag, setflag] = useState();
+  const [manadatoryCoursesSelected, setmanadatoryCoursesSelected] = useState([]);
+  const [electivesCoursesSelected, setelectivesCoursesSelected] = useState([]);
 
-  // this functions will generate the list of all the unselected courses as a select tag form.
-  const generateCourseList = () => {
-    var coursesList = [];
-    var i, courseName;
-    // console.log(newCourses);
-    // setallCourses([]);
-    // setallCourses([...newCourses]);
-    console.log("allCourses " + allCourses);
-    for (i = 0; i < newCourses.length; i++) {
-      courseName = newCourses[i];
-      //coursesList.push(<option value={courseName}>{courseName}</option>);
-      coursesList.push({ value: courseName, label: courseName });
-    }
-    return coursesList;
-  };
 
   const displaySemesters = () => {
     let item = [];
@@ -46,23 +32,47 @@ const Course = () => {
     return item;
   };
 
+
+
+
+  const onSelectionOfSemester = (e) => {
+
+    axios.get('http://localhost:5000/course/')
+      .then(response => {
+        var i;
+        for (i = 0; i < response.data.length; i++) {
+          if (response.data[i].semester_num != "-1") continue;
+          setallCourses(allCourses.push(response.data[i].course_name));
+        }
+        setnewCourses([...allCourses]);
+      });
+
+    setselectedSemester(e.target.value);
+    console.log(allCourses);
+  }
+
+
+  // this functions will generate the list of all the courses in newCourses(which contains unassigned courses) as react-select tag.
+  const generateCourseList = () => {
+    var coursesList = [];
+    var i, courseName;
+    for (i = 0; i < newCourses.length; i++) {
+      courseName = newCourses[i];
+      coursesList.push({ value: courseName, label: courseName });
+    }
+    return coursesList;
+  };
+
   // when one course is selected
   // update that course's semester in the database for which the course is selected
   // then remove the course from the array
   const onAdditionOfCourse = (e) => {
-    // console.log(e.target.value);
-    // console.log(newCourses);
     var selectedCourse;
-    // selectedCourse = String(e.target.value);
+    setmanadatoryCoursesSelected([...manadatoryCoursesSelected, e.value]);
     const semester = {
-      //selectedCourse: String(e.target.value),
       selectedCourse: String(e.value),
       semester_num: selectedSemester
     }
-
-    console.log("selectedCourse = " + selectedCourse);
-    console.log("selectedSemester = " + selectedSemester);
-    console.log("semester = " + semester);
 
     axios.post('http://localhost:5000/course/update/', semester)
       .then(res => console.log("Update done"));
@@ -76,74 +86,16 @@ const Course = () => {
     setflag(1);
   };
 
-  // const onAdditionOfElective = () => {
-  //   console.log("Elective Added");
-  // };
-
-  //it adds a new entry to select a new manadatory course
-  // const handleManadatoryAdd = () => {
   //   setInputList([...inputList, -1]);
-  //   setflag(1);
-  // };
 
-  //it adds a new entry to select a new elective course
-  // const handleElectiveAdd = () => {
-  //   console.log("Inside Elective Add");
-  //   setInputList([...inputList, -1]);
-  //   setflag(2);
-  // };
-
-  // const onSubmit = (e) => { };
-
-  //it handles removal of a particular course 
-  // const handleRemoval = () => {
   //   var lst = [...inputList];
   //   lst.pop();
   //   setInputList([...lst]);
-  // };
 
-  // when the admin has selected a semester, display him all the courses.
-  // admin will select the courses for a particular semester
-  // selected courses will be removed from the list
-  const onSelectionOfSemester = (e) => {
+  //coursesList.push(<option value={courseName}>{courseName}</option>);
 
-    axios.get('http://localhost:5000/course/')
-      .then(response => {
-        var i;
-        for (i = 0; i < response.data.length; i++) {
-          if (response.data[i].semester_num != "-1") continue;
-          // allCourses.push(response.data[i].course_name);
-          //console.log(response.data[i].course_name);
-          setallCourses(allCourses.push(response.data[i].course_name));
-        }
-        console.log(allCourses);
-        setnewCourses([...allCourses]);
-      });
-    console.log(allCourses);
-
-    setselectedSemester(String(e.target.value));
-    console.log("selectedSemester = " + selectedSemester);
-  }
-
-  // const getOptions = () => {
-  //   return [{ value: 'chocolate', label: 'Chocolate' }, { value: 'strawberry', label: 'Strawberry' }, { value: 'vanilla', label: 'Vanilla' }];
-  // }
-
-  const getOptionsForElectives = () => {
-    var lst = [];
-    var i;
-    console.log()
-    for (i = 0; i < newCourses.length; i++) {
-      var a = { value: newCourses[i], label: newCourses[i] }
-      lst.push(a);
-    }
-    //console.log("lst is");
-    //console.log(lst);
-    return lst;
-  }
 
   const onSelectionOfAnElective = (e) => {
-    //console.log(e.value);
     var lst = [];
     lst = [...e];
     console.log(lst);
@@ -151,13 +103,20 @@ const Course = () => {
   }
 
   const submitElectives = () => {
-    //console.log(lstOfElectives);
-    //console.log("Submitting Electives");
     var lst = []
     var i;
     for (i = 0; i < lstOfElectives.length; i++) {
       lst.push(lstOfElectives[i].value);
     }
+
+    var string = "";
+    var i;
+    for (i = 0; i < lst.length; i++) {
+      string = string.concat(lst[i] + " ");
+    }
+    lst.push(string);
+    console.log("lst", lst);
+    setelectivesCoursesSelected([...lst]);
 
     const semester = {
       selectedElectives: lst,
@@ -173,23 +132,130 @@ const Course = () => {
     axios.post('http://localhost:5000/course/updateElective/', semester)
       .then(res => console.log("Update done"));
 
-
     var i;
     for (i = 0; i < lstOfElectives.length; i++) {
       const index = newCourses.indexOf(String(lstOfElectives[i].value));
       newCourses.splice(index, 1);
     }
 
-    // const index = newCourses.indexOf(String(e.value));
-    // newCourses.splice(index, 1);
     console.log("newCourses = ", newCourses);
 
     setInputListElective([...inputListElective, 2]);
     setflag(1);
   }
 
+  const removeThisManadatoryCourse = (e) => {
+    var deleteThisCourse;
+    deleteThisCourse = e;
+
+    /* Remove this course from 'manadatoryCoursesSelected'.
+    Add it to 'newCourses' */
+
+    const index = manadatoryCoursesSelected.indexOf(String(deleteThisCourse));
+    manadatoryCoursesSelected.splice(index, 1);
+    setmanadatoryCoursesSelected([...manadatoryCoursesSelected]);
+
+    newCourses.push(deleteThisCourse);
+
+    const semester = {
+      selectedCourse: deleteThisCourse,
+      semester_num: -1
+    }
+
+    axios.post('http://localhost:5000/course/update/', semester)
+      .then(res => console.log("Update done"));
+
+  }
+
+  const removeThisElectiveCourse = (e) => {
+    var deleteThisCourse;
+    deleteThisCourse = e;
+    console.log("e", e);
+    var res;
+    res = deleteThisCourse.split(" ");
+    electivesCoursesSelected.splice(res.length - 1, 1);
+
+    /* Remove this course from 'manadatoryCoursesSelected'.
+    Add it to 'newCourses' */
+    console.log("electivesCoursesSelected before", electivesCoursesSelected);
+    console.log("newCourses before", newCourses);
+
+    var i;
+    for (i = 0; i < res.length - 1; i++) {
+      const index = electivesCoursesSelected.indexOf(res[i]);
+      electivesCoursesSelected.splice(index, 1);
+      newCourses.push(res[i]);
+    }
+    setelectivesCoursesSelected([...electivesCoursesSelected]);
+
+    console.log("electivesCoursesSelected after", electivesCoursesSelected);
+    console.log("newCourses after", newCourses);
+
+    for (i = 0; i < res.length - 1; i++) {
+      const semester = {
+        selectedCourse: res[i],
+        semester_num: -1
+      }
+
+      axios.post('http://localhost:5000/course/update/', semester)
+        .then(res => console.log("Update done"));
+    }
+  }
+
   return (
     <div>
+      <div>
+        <h3>Manadatory Courses Included In Semester {selectedSemester}</h3>
+        <table className="table">
+          <thead className="thead-light">
+            <tr>
+              <th>Manadatory Courses</th>
+              <th>Actions</th>
+            </tr>
+          </thead>
+          <tbody>
+            {manadatoryCoursesSelected.map((courses, i) => {
+              console.log(courses, i);
+              return (
+                <tr>
+                  <td>{courses}</td>
+                  <td><a onClick={() => { removeThisManadatoryCourse(courses) }}>delete</a></td>
+                </tr>
+              );
+            })}
+          </tbody>
+        </table>
+      </div>
+
+      <div>
+        <h3>Elective Courses Included In Semester {selectedSemester}</h3>
+        <table className="table">
+          <thead className="thead-light">
+            <tr>
+              <th>Elective Courses</th>
+              <th>Actions</th>
+            </tr>
+          </thead>
+          <tbody>
+            {electivesCoursesSelected.map((courses, i) => {
+              console.log(courses, i);
+              if (i == electivesCoursesSelected.length - 1) {
+                return (
+                  <tr>
+                    <td>{courses}</td>
+                    <td><a onClick={() => { removeThisElectiveCourse(courses) }}>delete</a></td>
+                  </tr>
+                );
+              }
+            })}
+          </tbody>
+        </table>
+      </div>
+
+
+
+
+
       <form >
         <div className="form-group">
           <label>Select Semester</label>
@@ -201,8 +267,8 @@ const Course = () => {
           inputListManadatory.map((x, i) => {
             //console.log(x, i);
             if (i == inputListManadatory.length - 1) {
-              console.log("Manadatory");
-              console.log(inputListManadatory);
+              // console.log("Manadatory");
+              // console.log(inputListManadatory);
               return (
                 <div keys={i} class="form-group">
                   <label>Add Manadatory Course</label>
@@ -215,8 +281,8 @@ const Course = () => {
         {
           inputListElective.map((x, i) => {
             if (i == inputListElective.length - 1) {
-              console.log("Elective");
-              console.log(inputListElective);
+              // console.log("Elective");
+              // console.log(inputListElective);
               return (
                 <div keys={i} class="form-group">
                   <label>Add Elective Course</label>
@@ -224,7 +290,7 @@ const Course = () => {
                     // defaultValue={getOptions()}
                     isMulti
                     name="colors"
-                    options={getOptionsForElectives()}
+                    options={generateCourseList()}
                     className="basic-multi-select"
                     classNamePrefix="select"
                     onChange={onSelectionOfAnElective}
