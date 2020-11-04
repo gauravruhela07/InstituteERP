@@ -3,6 +3,7 @@ const router = express.Router();
 const mongoose = require('mongoose');
 const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken');
+const checkAuth = require('../middleware/check_auth_student');
 
 // in this file student while logging in will generate jwt token for authrized access to some apis.
 var salt = 7;
@@ -11,7 +12,7 @@ var secret_key = 'secret_key_student';
 const Student = require('../models/student.model');
 
 router.post('/signup', (req, res, next) => {
-
+    // console.log(req.body)
     Student.find({email: req.body.email})
     .exec()
     .then(student => {
@@ -64,6 +65,7 @@ router.post('/login', (req, res, next) => {
                 message: 'Auth Failed'
             });
         }
+        // console.log(student);
         bcrypt.compare(req.body.password, student[0].password, (err, result) => {
             if (err) {
                 return res.json({
@@ -81,7 +83,11 @@ router.post('/login', (req, res, next) => {
                 });
                 return res.status(200).json({
                     message: 'Auth Successful',
-                    token: token
+                    token: token,
+                    email: student[0].email,
+                    name: student[0].name,
+                    department: student[0].department,
+                    roll_num: student[0].roll_num
                 });
             }
             
@@ -97,6 +103,9 @@ router.post('/login', (req, res, next) => {
         });
     });
 });
+
+
+
 
 router.delete('/:studentId', (req, res, next) => {
     Student.deleteOne({_id:req.params.studentId})

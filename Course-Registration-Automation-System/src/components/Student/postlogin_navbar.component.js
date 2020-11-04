@@ -10,10 +10,13 @@ export default class NavbarClass extends Component {
                 <Navbar.Toggle aria-controls="responsive-navbar-nav" />
                 <Navbar.Collapse id="responsive-navbar-nav">
                     <Nav className="mr-auto">
-                        <Nav.Link href="/show">College Events</Nav.Link>
+                        <Nav.Link href="/student/home">About</Nav.Link>
+                    </Nav>
+                    <Nav className="mr-auto">
+                        <Nav.Link href="/student/course_registration">Registration</Nav.Link>
                     </Nav>
                     <Nav>
-                        <Nav.Link href="/login">LogIn</Nav.Link>
+                        <Nav.Link href="/student/logout">LogOut</Nav.Link>
                     </Nav>
                 </Navbar.Collapse>
             </Navbar>

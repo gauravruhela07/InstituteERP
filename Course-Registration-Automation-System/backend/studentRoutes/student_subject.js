@@ -1,5 +1,6 @@
 const router = require('express').Router();
 const checkAuth = require('../middleware/check_auth_student');
+const Student = require('../models/student.model');
 
 let Student_Subject = require('../models/student_subject.model');
 
@@ -22,6 +23,17 @@ router.post('/add', checkAuth, (req, res) => {
     newStudent_Subject.save()
     .then(() => res.json('Student Subject Added!'))
     .catch(err => res.status(400).json('Error: '+res))
+})
+
+// fectching student details 
+router.get('/detail', checkAuth, (req, res) => {
+    // console.log(req)
+    const email=req.userData.email;
+    const query = {email: {$eq: email}};
+    // console.log(email, query);
+    Student.find(query)
+    .then(student => res.json(student))
+    .catch(err => res.status(400).json('Error: '+res));
 })
 
 // fetching subjects of student semester-wise
