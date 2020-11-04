@@ -1,10 +1,14 @@
 import React, { Component } from 'react'
-import {Redirect} from 'react-router-dom';
+import {Redirect, Route} from 'react-router-dom';
 import axios from 'axios';
 import { Button, FormGroup, FormControl, FormLabel } from "react-bootstrap";
 import './style.css';
-import NavbarClass from './prelogin_navbar.component';
 
+import NavbarClass from './prelogin_navbar.component';
+import StudentHome from './student.home';
+
+// email: gkr@gkr.com
+// pwd : ruhela@gkr
 export default class Login extends Component {
   constructor(props) {
     super(props)
@@ -18,7 +22,10 @@ export default class Login extends Component {
     this.state = {
        email: '',
        password: '',
-       loggedIn
+       loggedIn:loggedIn,
+       name:"",
+       department:"",
+       roll_num:""
     };
     // this.onChange = this.onChange.bind(this);
     this.submitForm = this.submitForm.bind(this);
@@ -54,7 +61,10 @@ export default class Login extends Component {
         let token = "Putin "+res.data.token;
         localStorage.setItem("token", token)
         this.setState({
-          loggedIn: true
+          loggedIn: true,
+          name:res.data.name,
+          roll_num: res.data.roll_num,
+          department: res.data.department
         });
       }
     })
@@ -64,7 +74,13 @@ export default class Login extends Component {
   render() {
     if(this.state.loggedIn) {
       // console.log(this.state);
-      return <Redirect to="/student/home"/>
+      // return <Redirect to="/student/home"/>
+      this.props.history.push('/student/home');
+      return (
+        <div>
+          <StudentHome student={this.state}/>
+        </div>
+      )
     }
     return (
       <div>
