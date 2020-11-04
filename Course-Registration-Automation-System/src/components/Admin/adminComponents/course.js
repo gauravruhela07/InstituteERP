@@ -33,6 +33,10 @@ const Course = () => {
 
 
   const onSelectionOfSemester = (e) => {
+    //manadatoryCoursesSelected = []
+    setmanadatoryCoursesSelected([]);
+    //electivesCoursesSelected = [];
+    setelectivesCoursesSelected([]);
     axios.get('http://localhost:5000/course/')
       .then(response => {
         var i;
@@ -72,9 +76,10 @@ const Course = () => {
             if (index != -1) continue;
             for (j = 0; j < response.data.length; j++) {
               if (ithElective == response.data[j].elective) {
-                string = string.concat(response.data[j].course_name + " ");
+                string = string.concat(response.data[j].course_name + ",");
               }
             }
+            string = string.slice(0, -1);
             eleDone.push(ithElective);
             console.log("string", string);
             electivesCoursesSelected.push(string);
@@ -141,7 +146,7 @@ const Course = () => {
     var lst = [];
     for (i = 0; i < lstOfElectives.length; i++) {
       lst.push(lstOfElectives[i].value);
-      if (i < lstOfElectives.length - 1) string = string.concat(lstOfElectives[i].value + " ");
+      if (i < lstOfElectives.length - 1) string = string.concat(lstOfElectives[i].value + ",");
       else if (i == lstOfElectives.length - 1) string = string.concat(lstOfElectives[i].value);
     }
     electivesCoursesSelected.push(string);
@@ -201,7 +206,7 @@ const Course = () => {
     deleteThisCourses = e;
     console.log("e in remove", e);
     var res;
-    res = deleteThisCourses.split(" ");
+    res = deleteThisCourses.split(",");
 
     console.log("electivesCoursesSelected before", electivesCoursesSelected);
     console.log("newCourses before", newCourses);
