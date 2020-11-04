@@ -1,5 +1,5 @@
 import React, { Component } from "react";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import axios from 'axios';
 import Select from 'react-select';
 import { Link } from "react-router-dom";
@@ -13,7 +13,6 @@ const Course = () => {
   const [inputListElective, setInputListElective] = useState([2]);
   const [lstOfElectives, setlstOfElectives] = useState([]);
   const [electiveNumber, setelectiveNumber] = useState(1);
-  const [flag, setflag] = useState();
   const [manadatoryCoursesSelected, setmanadatoryCoursesSelected] = useState([]);
   const [electivesCoursesSelected, setelectivesCoursesSelected] = useState([]);
 
@@ -33,22 +32,57 @@ const Course = () => {
   };
 
 
-
-
   const onSelectionOfSemester = (e) => {
-
     axios.get('http://localhost:5000/course/')
       .then(response => {
         var i;
+        var lst = [];
         for (i = 0; i < response.data.length; i++) {
           if (response.data[i].semester_num != "-1") continue;
-          setallCourses(allCourses.push(response.data[i].course_name));
+          // setallCourses(allCourses.push(response.data[i].course_name));
+          // setallCourses([...allCourses, response.data[i].course_name]);
+          lst.push(response.data[i].course_name);
         }
-        setnewCourses([...allCourses]);
+        setallCourses([...lst]);
+        setnewCourses([...lst]);
       });
 
+    console.log("allCourses", allCourses);
+
     setselectedSemester(e.target.value);
-    console.log(allCourses);
+    const semester = {
+      semester_num: e.target.value
+    }
+    var eleDone = [];
+    axios.post('http://localhost:5000/course/getSelectedSemesterCourses', semester)
+      .then(response => {
+        var i;
+        var j;
+        var ithElective;
+        for (i = 0; i < response.data.length; i++) {
+          // console.log("manadatoryCoursesSelected", manadatoryCoursesSelected)
+          if (response.data[i].elective == "-1") {
+            manadatoryCoursesSelected.push(response.data[i].course_name)
+            setmanadatoryCoursesSelected([...manadatoryCoursesSelected]);
+          }
+          else {
+            var string = "";
+            ithElective = response.data[i].elective;
+            var index = eleDone.indexOf(ithElective);
+            if (index != -1) continue;
+            for (j = 0; j < response.data.length; j++) {
+              if (ithElective == response.data[j].elective) {
+                string = string.concat(response.data[j].course_name + " ");
+              }
+            }
+            eleDone.push(ithElective);
+            console.log("string", string);
+            electivesCoursesSelected.push(string);
+            setelectivesCoursesSelected([...electivesCoursesSelected]);
+          }
+        }
+      });
+
   }
 
 
@@ -83,7 +117,6 @@ const Course = () => {
     console.log("newCourses = ", newCourses);
 
     setInputListManadatory([...inputListManadatory, -1]);
-    setflag(1);
   };
 
   //   setInputList([...inputList, -1]);
@@ -98,25 +131,21 @@ const Course = () => {
   const onSelectionOfAnElective = (e) => {
     var lst = [];
     lst = [...e];
-    console.log(lst);
+    // console.log("e", e);
     setlstOfElectives([...lst]);
   }
 
   const submitElectives = () => {
-    var lst = []
     var i;
+    var string = "";
+    var lst = [];
     for (i = 0; i < lstOfElectives.length; i++) {
       lst.push(lstOfElectives[i].value);
+      if (i < lstOfElectives.length - 1) string = string.concat(lstOfElectives[i].value + " ");
+      else if (i == lstOfElectives.length - 1) string = string.concat(lstOfElectives[i].value);
     }
-
-    var string = "";
-    var i;
-    for (i = 0; i < lst.length; i++) {
-      string = string.concat(lst[i] + " ");
-    }
-    lst.push(string);
-    console.log("lst", lst);
-    setelectivesCoursesSelected([...lst]);
+    electivesCoursesSelected.push(string);
+    setelectivesCoursesSelected([...electivesCoursesSelected]);
 
     const semester = {
       selectedElectives: lst,
@@ -138,10 +167,10 @@ const Course = () => {
       newCourses.splice(index, 1);
     }
 
-    console.log("newCourses = ", newCourses);
+    // console.log("newCourses = ", newCourses);
 
     setInputListElective([...inputListElective, 2]);
-    setflag(1);
+    // setflag(1);
   }
 
   const removeThisManadatoryCourse = (e) => {
@@ -168,30 +197,29 @@ const Course = () => {
   }
 
   const removeThisElectiveCourse = (e) => {
-    var deleteThisCourse;
-    deleteThisCourse = e;
-    console.log("e", e);
+    var deleteThisCourses;
+    deleteThisCourses = e;
+    console.log("e in remove", e);
     var res;
-    res = deleteThisCourse.split(" ");
-    electivesCoursesSelected.splice(res.length - 1, 1);
+    res = deleteThisCourses.split(" ");
 
-    /* Remove this course from 'manadatoryCoursesSelected'.
-    Add it to 'newCourses' */
     console.log("electivesCoursesSelected before", electivesCoursesSelected);
     console.log("newCourses before", newCourses);
 
+    const index = electivesCoursesSelected.indexOf(deleteThisCourses);
+    electivesCoursesSelected.splice(index, 1);
+    setelectivesCoursesSelected([...electivesCoursesSelected]);
+
     var i;
-    for (i = 0; i < res.length - 1; i++) {
-      const index = electivesCoursesSelected.indexOf(res[i]);
-      electivesCoursesSelected.splice(index, 1);
+    for (i = 0; i < res.length; i++) {
       newCourses.push(res[i]);
     }
-    setelectivesCoursesSelected([...electivesCoursesSelected]);
+    setnewCourses([...newCourses]);
 
     console.log("electivesCoursesSelected after", electivesCoursesSelected);
     console.log("newCourses after", newCourses);
 
-    for (i = 0; i < res.length - 1; i++) {
+    for (i = 0; i < res.length; i++) {
       const semester = {
         selectedCourse: res[i],
         semester_num: -1
@@ -205,7 +233,6 @@ const Course = () => {
   return (
     <div>
       <div>
-        {/* <h3>Manadatory Courses Included In Semester {selectedSemester}</h3> */}
         <table className="table">
           <thead className="thead-light">
             <tr>
@@ -215,7 +242,7 @@ const Course = () => {
           </thead>
           <tbody>
             {manadatoryCoursesSelected.map((courses, i) => {
-              console.log(courses, i);
+              // console.log(courses, i);
               return (
                 <tr>
                   <td>{courses}</td>
@@ -238,23 +265,17 @@ const Course = () => {
           </thead>
           <tbody>
             {electivesCoursesSelected.map((courses, i) => {
-              console.log(courses, i);
-              if (i == electivesCoursesSelected.length - 1) {
-                return (
-                  <tr>
-                    <td>{courses}</td>
-                    <td><a onClick={() => { removeThisElectiveCourse(courses) }}>delete</a></td>
-                  </tr>
-                );
-              }
+              // console.log(courses, i);
+              return (
+                <tr>
+                  <td>{courses}</td>
+                  <td><a onClick={() => { removeThisElectiveCourse(courses) }}>delete</a></td>
+                </tr>
+              );
             })}
           </tbody>
         </table>
       </div>
-
-
-
-
 
       <form >
         <div className="form-group">
