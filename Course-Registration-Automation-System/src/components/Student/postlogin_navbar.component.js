@@ -11,8 +11,6 @@ export default class NavbarClass extends Component {
                 <Navbar.Collapse id="responsive-navbar-nav">
                     <Nav className="mr-auto">
                         <Nav.Link href="/student/home">About</Nav.Link>
-                    </Nav>
-                    <Nav className="mr-auto">
                         <Nav.Link href="/student/course_registration">Registration</Nav.Link>
                     </Nav>
                     <Nav>
