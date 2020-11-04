@@ -39,6 +39,22 @@ router.route('/').get((req, res) => {
 });
 
 
+router.route('/getSelectedSemesterCourses/').post((req, res) => {
+    const semester_num = req.body.semester_num;
+    console.log("Inside getSelectedSemesterCourses");
+    console.log(semester_num);
+
+    Course.find({ 'semester_num': semester_num })//, 'course_name')
+        .then(coursesInTheSemester => res.json(coursesInTheSemester))
+        .catch(err => res.status(400).json('Error: ' + err));
+});
+
+
+
+
+
+
+
 // post means to add something to the server
 router.route('/add').post((req, res) => {
     const course_name = req.body.course_name;
