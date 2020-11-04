@@ -3,6 +3,7 @@ import React, { Component } from 'react'
 import {Link, Redirect} from 'react-router-dom';
 
 import NavbarClass from './postlogin_navbar.component';
+import Login from './student.login';
 export default class StudentHome extends Component {
     constructor(props) {
         super(props)
@@ -59,7 +60,13 @@ export default class StudentHome extends Component {
     render() {
         
         if(this.state.loggedIn === false){
-            return <Redirect to='/student/login' />
+            this.props.history.push('/student/login');
+            // return <Redirect to='/student/login' />
+            return (
+                <div>
+                    <Login/>
+                </div>
+            );
         }
         return (
             <div>
