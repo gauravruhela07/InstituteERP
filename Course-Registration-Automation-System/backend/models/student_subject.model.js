@@ -3,7 +3,7 @@ var mongoose = require('mongoose');
 var Schema = mongoose.Schema;
 
 var StudentSubjectSchema = new Schema({
-    roll_num: {type:String, required:true, unique:true},
+    roll_num: {type:String, required:true},
     semester_num : {type:String, required: true},
     course_id : {type:String, required:true, unique:true},
     course_name : {type:String, required:true},

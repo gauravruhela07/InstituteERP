@@ -52,7 +52,13 @@ export default class StudentHome extends Component {
                 department: res.data[0].department,
                 roll_num: res.data[0].roll_num
             })
-            // console.log(this.state)
+            if(!localStorage.getItem('roll_num')) {
+                localStorage.setItem('roll_num', this.state.roll_num);
+            }
+            if(!localStorage.getItem('department')) {
+                localStorage.setItem('department', this.state.department);
+            }
+
         })
         .catch(err => console.log("Error: "+err))
     }
