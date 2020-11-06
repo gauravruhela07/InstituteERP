@@ -1,6 +1,6 @@
 import axios from 'axios';
 import React, { Component } from 'react'
-import {Link, Redirect} from 'react-router-dom';
+// import {Link, Redirect} from 'react-router-dom';
 
 import NavbarClass from './postlogin_navbar.component';
 import Login from './student.login';
@@ -35,17 +35,17 @@ export default class StudentHome extends Component {
         this.setState({
             email:localStorage.getItem("email")
         });
-
-        axios.get('http://localhost:5000/student_subject/detail', {
-            body: {
-                email:localStorage.getItem("email")
-            },
+        const data = {
+            email:localStorage.getItem('email')
+        }
+        // console.log(data)
+        axios.post('http://localhost:5000/student_subject/detail', data, {
             headers: {
-                'Authorization': localStorage.getItem("token")
+                'authorization':localStorage.getItem('token')
             }
         })
         .then(res => {
-            // console.log(res.data[0].email);
+            console.log(res.data[0]);
             this.setState({
                 email:res.data[0].email,
                 name:res.data[0].name,
@@ -67,7 +67,6 @@ export default class StudentHome extends Component {
         
         if(this.state.loggedIn === false){
             this.props.history.push('/student/login');
-            // return <Redirect to='/student/login' />
             return (
                 <div>
                     <Login/>

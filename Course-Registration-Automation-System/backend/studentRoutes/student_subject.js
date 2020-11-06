@@ -29,11 +29,12 @@ router.post('/add', checkAuth, (req, res) => {
 })
 
 // fectching student details 
-router.get('/detail', checkAuth, (req, res) => {
+router.post('/detail', checkAuth, (req, res) => {
+// router.post('/detail', (req, res) => {
     // console.log(req)
-    const email=req.userData.email;
+    const email=req.body.email;
     const query = {email: {$eq: email}};
-    // console.log(email, query);
+    console.log(email, query);
     Student.find(query)
     .then(student => res.json(student))
     .catch(err => res.status(400).json('Error: '+res));
@@ -51,15 +52,14 @@ router.get('/show', checkAuth, (req, res) => {
     .catch(err => res.status(400).json('Error: '+res));
 })
 
-router.get('/current_sem', (req, res) => {
+router.post('/current_sem', checkAuth, (req, res) => {
+    // console.log(req)
     const roll_num = req.body.roll_num;
     const query = {roll_num: {$eq: roll_num}};
-
     Student_Subject.find(query)
     .then(student_subject => {
         var max_sem = 0;
         student_subject.forEach((msg) => {
-            // console.log(msg.semester_num);
             if(msg.semester_num>max_sem){
                 max_sem=msg.semester_num;
             }
