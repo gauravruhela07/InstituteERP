@@ -53,12 +53,25 @@ export default class Registration extends Component {
         const data = {
             roll_num: localStorage.getItem('roll_num')
         }
-        axios.post("http://localhost:5000/student_subject/current_sem", data, {
+        axios.post("http://localhost:5000/student_subject/current_sem_courses", data, {
             headers: {
                 'authorization':localStorage.getItem('token')
             }
         })
-        .then(res => this.setState({courses:res.data}))
+        .then(res => {
+            var courses = [];
+            var len=res.data.length;
+            for(var i=0; i<len; i++){
+                var splitted = res.data[i].dept_alloted.split(',');
+                for(var j=0; j<splitted.length; j++){
+                    if(splitted[j]===localStorage.getItem('department')){
+                        courses.push(res.data[i]);
+                        break;
+                    }
+                }
+            }
+            this.setState({courses:courses});
+        })
         .catch(err => {
             console.log(err);
         })
@@ -132,11 +145,11 @@ export default class Registration extends Component {
         }
         const selectedOption = this.state.selectedOption;
         const options = this.convToOptions(0);
-        return <Select
+        return (<div><label>Elective 1:</label><Select
             value={selectedOption}
             onChange={this.handleChange}
             options={options}
-        />
+        /><br/></div>)
     }
     createSelect1(){
         if(this.state.courses.length==0){
@@ -150,7 +163,7 @@ export default class Registration extends Component {
             value={selectedOption}
             onChange={this.handleChange1}
             options={options}
-        /></div>)
+        /><br/></div>)
         }
     }
     createSelect2(){
@@ -165,7 +178,7 @@ export default class Registration extends Component {
             value={selectedOption}
             onChange={this.handleChange2}
             options={options}
-        /></div>)
+        /><br/></div>)
         }
     }
     createSelect3(){
@@ -180,18 +193,71 @@ export default class Registration extends Component {
             value={selectedOption}
             onChange={this.handleChange3}
             options={options}
-        /></div>)
+        /><br/></div>)
         }
     }
 
     
     onSubmit(e) {
         e.preventDefault();
-        console.log(this.state);
+        var course_id_list = [];
+        var course_name_list = [];
+
+        // mandatory courses
+        for(var i=0; i<this.state.courses.length; i++){
+            if(this.state.courses[i].elective===-1) {
+                course_id_list.push(this.state.courses[i].course_id);
+                course_name_list.push(this.state.courses[i].course_name);
+            }
+        }
+
+        // electives that the student has chosen
+        if(this.state.selectedOption!=null){
+            course_id_list.push(this.state.selectedOption.value);
+            course_name_list.push(this.state.selectedOption.label);
+        }
+        if(this.state.selectedOption1!=null){
+            course_id_list.push(this.state.selectedOption1.value);
+            course_name_list.push(this.state.selectedOption1.label);
+        }
+        if(this.state.selectedOption2!=null){
+            course_id_list.push(this.state.selectedOption2.value);
+            course_name_list.push(this.state.selectedOption2.label);
+        }
+        if(this.state.selectedOption3!=null){
+            course_id_list.push(this.state.selectedOption3.value);
+            course_name_list.push(this.state.selectedOption3.label);
+        }
+        axios.post("http://localhost:5000/student_subject/current_sem",
+         {roll_num:localStorage.getItem('roll_num')},
+         {
+             headers: {
+                 'authorization':localStorage.getItem('token')
+             }
+         })
+        .then(res => {
+            const data = {
+                roll_num:localStorage.getItem('roll_num'),
+                semester_num:res.data,
+                course_id_list:course_id_list,
+                course_name_list:course_name_list
+            }
+            console.log(data)
+            axios.post('http://localhost:5000/student_subject/registerWithElective', data, {
+                headers: {
+                    'authorization':localStorage.getItem('token')
+                }
+            })
+            .then(res => console.log(res.data))
+            .catch(err => console.log('Error: '+err));
+        })
+        .catch(err => console.log('Error: '+err)) 
+        const data = {
+            roll_num:localStorage.getItem('roll_num')
+        }
     }
 
     render() {
-        var group = this.groupByOptional();
         if(this.state.loggedIn===false){
             this.props.history.push('/student/login');
             return (
@@ -222,19 +288,15 @@ export default class Registration extends Component {
             <div className="container">
                 <h3>Optional Courses</h3>
                 <form onSubmit={this.onSubmit}>
-                    <label>Elective 1:</label>
                     {
                         this.createSelect0()
                     }
-                    <br/>
                     {
                         this.createSelect1()
                     }
-                    <br/>
                     {
                         this.createSelect2()
                     }
-                    <br/>
                     {
                         this.createSelect3()
                     }
