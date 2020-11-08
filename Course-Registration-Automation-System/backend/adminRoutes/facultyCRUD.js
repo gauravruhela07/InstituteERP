@@ -3,22 +3,13 @@ let Faculty = require('../models/faculty.model');
 const mongoose = require('mongoose');
 
 
-// //get means to get something from the server and give it back to the client(user)
-// // give the admin all the courses
-// router.route('/').get((req, res) => {
-
-//     // const semester_num = req.body.semester_num;
-//     // console.log(semester_num);
-
-//     // Course.find({ 'semester_num': semester_num }, 'course_name')
-//     //     .then(coursesInTheSemester => res.json(coursesInTheSemester))
-//     //     .catch(err => res.status(400).json('Error: ' + err));
-//     console.log("Inside get");
-//     Course.find()
-//         .then(allCourses => res.json(allCourses))
-//         .catch(err => res.status(400).json('Error: ' + err));
-
-// });
+//get means to get something from the server and give it back to the client(user)
+// give the admin all the faculties who are admin
+router.route('/getAdmins').get((req, res) => {
+    Faculty.find({ 'admin': true })
+        .then(admins => res.json(admins))
+        .catch(err => res.status(400).json('Error: ' + err));
+});
 
 
 // post means to add something to the server
