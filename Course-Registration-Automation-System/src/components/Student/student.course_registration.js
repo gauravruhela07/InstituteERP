@@ -1,6 +1,7 @@
 import axios from 'axios';
 import React, { Component } from 'react';
-import { FormControl } from 'react-bootstrap';
+import Select from 'react-select';
+// import { FormControl } from 'react-bootstrap';
 // import Course from '../../../backend/models/course.model';
 
 import NavbarClass from './postlogin_navbar.component';
@@ -15,16 +16,6 @@ const CourseTable = (props) => (
         {/* <td>{props.course.elective}</td> */}
     </tr>
 )
-
-const OptionalForms = (props) => (
-    <div className="form-group">
-        <input 
-            className="form-control"
-            type="text"
-            value={props.course_name}
-        />
-    </div>
-)
 export default class Registration extends Component {
     constructor(props) {
         super(props)
@@ -36,14 +27,26 @@ export default class Registration extends Component {
         this.state = {
             loggedIn:loggedIn,
             courses : [],
-            checked: 0
+            checked: 0,
+            selectedOption:null,
+            selectedOption1:null,
+            selectedOption2:null,
+            selectedOption3:null
         }
 
         this.courseList = this.courseList.bind(this);
         this.countNumberOfOptional = this.countNumberOfOptional.bind(this);
         this.groupByOptional = this.groupByOptional.bind(this);
-        this.radioChange = this.radioChange.bind(this);
-        this.radioLabel = this.radioLabel.bind(this);
+        this.handleChange = this.handleChange.bind(this);
+        this.handleChange1 = this.handleChange1.bind(this);
+        this.handleChange2 = this.handleChange2.bind(this);
+        this.handleChange3 = this.handleChange3.bind(this);
+        this.onSubmit = this.onSubmit.bind(this);
+        this.convToOptions = this.convToOptions.bind(this);
+        this.createSelect0 = this.createSelect0.bind(this);
+        this.createSelect1 = this.createSelect1.bind(this);
+        this.createSelect2 = this.createSelect2.bind(this);
+        this.createSelect3 = this.createSelect3.bind(this);
     }
 
     componentDidMount() {
@@ -87,10 +90,7 @@ export default class Registration extends Component {
                 optionalSet.add(course.elective)
             }
         });
-        // var optionalSet = this.countNumberOfOptional();
-        console.log(optionalSet);
         var group = [];
-        console.log(this.state.courses);
         for(let elective of optionalSet) {
             var optionalArr = [];
             this.state.courses.forEach((course) => {
@@ -100,38 +100,98 @@ export default class Registration extends Component {
             });
             group.push(optionalArr);
         }
-        console.log(group[0][0]);
         return group;
     }
 
-    radioChange = (i) => {
-        this.setState({checked:i});
+    handleChange(selectedOption){
+        this.setState({selectedOption:selectedOption});
+    }
+    handleChange1(selectedOption1){
+        this.setState({selectedOption1:selectedOption1});
+    }
+    handleChange2(selectedOption2){
+        this.setState({selectedOption2:selectedOption2});
+    }
+    handleChange3(selectedOption3){
+        this.setState({selectedOption3:selectedOption3});
     }
 
-    radioLabel() {
+    convToOptions(i){
+        const options = [];
+        if(this.state.courses.length==0)
+            return options;
+        var group = this.groupByOptional();
+        group[i].map(course => options.push({value:course.course_id, label:course.course_name}));
+        // course.map(course => options.push({value:course.course_name, label:course.course_name}));
+        return options;
+    }
+
+    createSelect0(){
         if(this.state.courses.length==0){
-            return (<div>Loading...</div>);
+            return <h4>Loading...</h4>
+        }
+        const selectedOption = this.state.selectedOption;
+        const options = this.convToOptions(0);
+        return <Select
+            value={selectedOption}
+            onChange={this.handleChange}
+            options={options}
+        />
+    }
+    createSelect1(){
+        if(this.state.courses.length==0){
+            return <h4>Loading...</h4>
         }
         var group = this.groupByOptional();
-        console.log(group);
-        return group[0].map((course, i) => {
-            // console.l og();
-            return <div>
-                    {course.course_id+': '+course.course_name}
-                    <input
-                        type='radio'
-                        checked={this.state.checked==0?true:false}
-                        onChange={this.radioChange.bind(this,i)}
-                        value={course.course_id+': '+course.course_name}
-                        />
-                    </div>
-        });
+        if(group.length>1){
+        const selectedOption = this.state.selectedOption1;
+        const options = this.convToOptions(1);
+        return (<div><label>Elective 2:</label><Select
+            value={selectedOption}
+            onChange={this.handleChange1}
+            options={options}
+        /></div>)
+        }
+    }
+    createSelect2(){
+        if(this.state.courses.length==0){
+            return <h4>Loading...</h4>
+        }
+        var group = this.groupByOptional();
+        if(group.length>2){
+        const selectedOption = this.state.selectedOption1;
+        const options = this.convToOptions(2);
+        return (<div><label>Elective 3:</label><Select
+            value={selectedOption}
+            onChange={this.handleChange2}
+            options={options}
+        /></div>)
+        }
+    }
+    createSelect3(){
+        if(this.state.courses.length==0){
+            return <h4>Loading...</h4>
+        }
+        var group = this.groupByOptional();
+        if(group.length>3){
+        const selectedOption = this.state.selectedOption1;
+        const options = this.convToOptions(3);
+        return (<div><label>Elective 4:</label><Select
+            value={selectedOption}
+            onChange={this.handleChange3}
+            options={options}
+        /></div>)
+        }
     }
 
+    
+    onSubmit(e) {
+        e.preventDefault();
+        console.log(this.state);
+    }
 
     render() {
-        // console.log(this.groupByOptional());
-        console.log(this.state.courses.length);
+        var group = this.groupByOptional();
         if(this.state.loggedIn===false){
             this.props.history.push('/student/login');
             return (
@@ -162,7 +222,23 @@ export default class Registration extends Component {
             <div className="container">
                 <h3>Optional Courses</h3>
                 <form onSubmit={this.onSubmit}>
-                    {this.radioLabel()}
+                    <label>Elective 1:</label>
+                    {
+                        this.createSelect0()
+                    }
+                    <br/>
+                    {
+                        this.createSelect1()
+                    }
+                    <br/>
+                    {
+                        this.createSelect2()
+                    }
+                    <br/>
+                    {
+                        this.createSelect3()
+                    }
+                <input type='submit' value="Submit" />
                 </form>
             </div> 
         </div>
