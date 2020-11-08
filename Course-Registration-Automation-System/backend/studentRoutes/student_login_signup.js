@@ -77,10 +77,10 @@ router.post('/login', (req, res, next) => {
                     email: student[0].email,
                     studentId: student[0]._id
                 }, 
-                secret_key,
-                {
-                    expiresIn: "1h"
-                });
+                secret_key
+                // {
+                    // expiresIn: "1h"}
+                );
                 return res.status(200).json({
                     message: 'Auth Successful',
                     token: token,

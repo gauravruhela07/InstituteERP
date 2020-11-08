@@ -1,4 +1,7 @@
 import React, {Component} from 'react';
+import axios from 'axios';
+
+import NavbarClass from './postlogin_navbar.component';
 import Login from './student.login';
 
 
@@ -11,8 +14,13 @@ export default class Courses extends Component{
             loggedIn=false;
         }
         this.state = {
-            loggedIn : loggedIn
+            loggedIn : loggedIn,
+            courses : []
         }
+    }
+
+    componentDidMount() {
+        // axios.get()  
     }
     render() {
         if(this.state.logged===false){
@@ -24,7 +32,16 @@ export default class Courses extends Component{
             );
         }
         else {
-            
+            return (
+                <div>
+                    <NavbarClass/>
+                    <br/>
+                    <div className="container">
+                        <h3>Courses</h3>
+                        
+                    </div>
+                </div>
+            )
         }
     }
 }
