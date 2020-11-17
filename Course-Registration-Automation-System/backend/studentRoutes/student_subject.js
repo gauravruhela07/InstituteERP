@@ -29,6 +29,7 @@ router.post('/add', checkAuth, (req, res) => {
 
 router.post('/registerWithElective', checkAuth, (req, res) => {
     var len = req.body.course_id_list.length;
+    console.log(req.body)
     for(var i=0; i<len; i++) {
         var newStudent_Subject = new Student_Subject({
             roll_num:req.body.roll_num,
@@ -75,9 +76,14 @@ router.post('/current_sem_courses', checkAuth, (req, res) => {
                 max_sem=msg.semester_num;
             }
         });
-        const query1 = {semester_num: {$eq:max_sem+1}};
+        var curr_sem = Number(max_sem)+1;
+        console.log(curr_sem.toString());
+        const query1 = {semester_num: {$eq:curr_sem.toString()}};
         Course.find(query1)
-        .then(courses => res.json(courses))
+        .then(courses => {
+            // console.log(courses);
+            res.json(courses);
+        })
         .catch(err => res.status(400).json('Error: '+res));
     })
     .catch(err => res.status(400).json('Error '+res));

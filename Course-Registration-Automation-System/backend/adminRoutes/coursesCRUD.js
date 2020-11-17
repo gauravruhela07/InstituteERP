@@ -39,9 +39,9 @@ router.route('/add').post((req, res) => {
     const department = req.body.department;
     const elective = req.body.elective;
     const semester_num = req.body.semester_num;
+    const dept_alloted = req.body.dept_alloted;
 
-    const courses = new Course({ "course_name": course_name, "course_id": course_id, "department": department, "elective": elective, "semester_num": semester_num });
-    // console.log(courses);
+    const courses = new Course({ "course_name": course_name, "course_id": course_id, "department": department, "elective": elective, "semester_num": semester_num, "dept_alloted":dept_alloted });
 
     courses.save()
         .then(() => res.json('course added!'))

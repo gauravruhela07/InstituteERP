@@ -47,6 +47,7 @@ export default class Registration extends Component {
         this.createSelect1 = this.createSelect1.bind(this);
         this.createSelect2 = this.createSelect2.bind(this);
         this.createSelect3 = this.createSelect3.bind(this);
+        this.optionalCoursesHeader = this.optionalCoursesHeader.bind(this);
     }
 
     componentDidMount() {
@@ -71,10 +72,12 @@ export default class Registration extends Component {
                 }
             }
             this.setState({courses:courses});
+            // console.log(this.state)
         })
         .catch(err => {
             console.log(err);
         })
+        
     }
 
     
@@ -102,6 +105,7 @@ export default class Registration extends Component {
             if(course.elective > -1) {
                 optionalSet.add(course.elective)
             }
+            // console.log(course.elective);
         });
         var group = [];
         for(let elective of optionalSet) {
@@ -134,6 +138,9 @@ export default class Registration extends Component {
         if(this.state.courses.length==0)
             return options;
         var group = this.groupByOptional();
+        if(group.length==0){
+            return -1;
+        }
         group[i].map(course => options.push({value:course.course_id, label:course.course_name}));
         // course.map(course => options.push({value:course.course_name, label:course.course_name}));
         return options;
@@ -145,11 +152,13 @@ export default class Registration extends Component {
         }
         const selectedOption = this.state.selectedOption;
         const options = this.convToOptions(0);
-        return (<div><label>Elective 1:</label><Select
-            value={selectedOption}
-            onChange={this.handleChange}
-            options={options}
-        /><br/></div>)
+        if(options!==-1){
+            return (<div><label>Elective 1:</label><Select
+                value={selectedOption}
+                onChange={this.handleChange}
+                options={options}
+            /><br/></div>)
+        }
     }
     createSelect1(){
         if(this.state.courses.length==0){
@@ -199,13 +208,14 @@ export default class Registration extends Component {
 
     
     onSubmit(e) {
+        // console.log(this.state.courses.length);
         e.preventDefault();
         var course_id_list = [];
         var course_name_list = [];
 
         // mandatory courses
         for(var i=0; i<this.state.courses.length; i++){
-            if(this.state.courses[i].elective===-1) {
+            if(this.state.courses[i].elective==-1) {
                 course_id_list.push(this.state.courses[i].course_id);
                 course_name_list.push(this.state.courses[i].course_name);
             }
@@ -256,6 +266,12 @@ export default class Registration extends Component {
             roll_num:localStorage.getItem('roll_num')
         }
     }
+    optionalCoursesHeader(){
+        const group = this.groupByOptional();
+        if(group.length!==0){
+            return <h3>Optional Courses</h3>
+        }
+    }
 
     render() {
         if(this.state.loggedIn===false){
@@ -266,6 +282,7 @@ export default class Registration extends Component {
                 </div>
             );
         }
+        // console.log(this.state);
     return (
         <div>
             <NavbarClass/>
@@ -286,7 +303,11 @@ export default class Registration extends Component {
                 </table>
             </div>
             <div className="container">
-                <h3>Optional Courses</h3>
+                {/* <h3>Optional Courses</h3>
+                 */}
+                 {
+                     this.optionalCoursesHeader()
+                 }
                 <form onSubmit={this.onSubmit}>
                     {
                         this.createSelect0()
