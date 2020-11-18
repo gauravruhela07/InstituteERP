@@ -1,7 +1,7 @@
 const router = require('express').Router();
 const checkAuth = require('../middleware/check_auth_student');
-const Student = require('../models/student.model');
 
+const Student = require('../models/student.model');
 let Student_Subject = require('../models/student_subject.model');
 let Course = require('../models/course.model');
 
@@ -9,7 +9,6 @@ let Course = require('../models/course.model');
 // checkAuth will check whether client has sent valid token or not
 router.post('/add', checkAuth, (req, res) => {   
 
-    // console.log(req.body);
     const roll_num = req.body.roll_num;
     const course_id = req.body.course_id;
     const course_name = req.body.course_name;
@@ -29,7 +28,6 @@ router.post('/add', checkAuth, (req, res) => {
 
 router.post('/registerWithElective', checkAuth, (req, res) => {
     var len = req.body.course_id_list.length;
-    console.log(req.body)
     for(var i=0; i<len; i++) {
         var newStudent_Subject = new Student_Subject({
             roll_num:req.body.roll_num,
@@ -39,14 +37,17 @@ router.post('/registerWithElective', checkAuth, (req, res) => {
         })
         newStudent_Subject.save()
     }
-    res.json('Subjects Added With Elective');
+    const query = {roll_num:req.body.roll_num};
+    const args = {$set: {"has_registered": req.body.hasRegistered}};
+    Student.update(query, args)
+    .then(student => res.json('Subjects Added With Elective'))
+    .catch(err => res.status(400).json('Error: '+res))
 });
 
 // fectching student details 
 router.post('/detail', checkAuth, (req, res) => {
     const email=req.body.email;
     const query = {email: {$eq: email}};
-    console.log(email, query);
     Student.find(query)
     .then(student => res.json(student))
     .catch(err => res.status(400).json('Error: '+res));
@@ -65,7 +66,6 @@ router.get('/show', checkAuth, (req, res) => {
 })
 
 router.post('/current_sem_courses', checkAuth, (req, res) => {
-    // console.log(req)
     const roll_num = req.body.roll_num;
     const query = {roll_num: {$eq: roll_num}};
     Student_Subject.find(query)
@@ -77,7 +77,6 @@ router.post('/current_sem_courses', checkAuth, (req, res) => {
             }
         });
         var curr_sem = Number(max_sem)+1;
-        console.log(curr_sem.toString());
         const query1 = {semester_num: {$eq:curr_sem.toString()}};
         Course.find(query1)
         .then(courses => {
@@ -87,6 +86,16 @@ router.post('/current_sem_courses', checkAuth, (req, res) => {
         .catch(err => res.status(400).json('Error: '+res));
     })
     .catch(err => res.status(400).json('Error '+res));
+})
+
+router.post('/checkRegisteration', checkAuth, (req, res) => {
+    const roll_num = req.body.roll_num;
+    const query = {roll_num: {$eq: roll_num}};
+    Student.find(query)
+    .then(student => {
+        res.json(student[0].has_registered);
+    })
+    .catch(err => res.status(400).json('Error: '+res));
 })
 
 router.post('/current_sem', checkAuth, (req, res) => {

@@ -31,7 +31,8 @@ export default class Registration extends Component {
             selectedOption:null,
             selectedOption1:null,
             selectedOption2:null,
-            selectedOption3:null
+            selectedOption3:null, 
+            hasRegistered:"1"
         }
 
         this.courseList = this.courseList.bind(this);
@@ -72,12 +73,21 @@ export default class Registration extends Component {
                 }
             }
             this.setState({courses:courses});
-            // console.log(this.state)
         })
         .catch(err => {
             console.log(err);
         })
-        
+
+        // post request for fetching registeration status
+        axios.post("http://localhost:5000/student_subject/checkRegisteration", data, {
+            headers: {
+                'authorization':localStorage.getItem('token')
+            }
+        })
+        .then(res => this.setState({hasRegistered:res.data}))
+        .catch(err => {
+            console.log(err);
+        })
     }
 
     
@@ -142,7 +152,6 @@ export default class Registration extends Component {
             return -1;
         }
         group[i].map(course => options.push({value:course.course_id, label:course.course_name}));
-        // course.map(course => options.push({value:course.course_name, label:course.course_name}));
         return options;
     }
 
@@ -250,7 +259,8 @@ export default class Registration extends Component {
                 roll_num:localStorage.getItem('roll_num'),
                 semester_num:res.data,
                 course_id_list:course_id_list,
-                course_name_list:course_name_list
+                course_name_list:course_name_list,
+                hasRegistered:"1"
             }
             console.log(data)
             axios.post('http://localhost:5000/student_subject/registerWithElective', data, {
@@ -262,9 +272,8 @@ export default class Registration extends Component {
             .catch(err => console.log('Error: '+err));
         })
         .catch(err => console.log('Error: '+err)) 
-        const data = {
-            roll_num:localStorage.getItem('roll_num')
-        }
+
+        window.location = '/student/thanks';
     }
     optionalCoursesHeader(){
         const group = this.groupByOptional();
@@ -282,49 +291,58 @@ export default class Registration extends Component {
                 </div>
             );
         }
-        // console.log(this.state);
-    return (
-        <div>
-            <NavbarClass/>
-            <div className="container">
-                <h3>Mandatory Courses</h3>
-                <table className="table">
-                    <thead className="thead-light">
-                        <tr>
-                            <th>Course Name</th>
-                            <th>Course ID</th>
-                            <th>Department</th>
-                            {/* <th>Elective</th> */}
-                        </tr>
-                    </thead>
-                    <tbody>
-                        {this.courseList()}
-                    </tbody>
-                </table>
+    if(this.state.hasRegistered==-1) {
+        return (
+            <div>
+                <NavbarClass/>
+                <div className="container">
+                    <h3>Mandatory Courses</h3>
+                    <table className="table">
+                        <thead className="thead-light">
+                            <tr>
+                                <th>Course Name</th>
+                                <th>Course ID</th>
+                                <th>Department</th>
+                                {/* <th>Elective</th> */}
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {this.courseList()}
+                        </tbody>
+                    </table>
+                </div>
+                <div className="container">
+                    {/* <h3>Optional Courses</h3>
+                    */}
+                    {
+                        this.optionalCoursesHeader()
+                    }
+                    <form onSubmit={this.onSubmit}>
+                        {
+                            this.createSelect0()
+                        }
+                        {
+                            this.createSelect1()
+                        }
+                        {
+                            this.createSelect2()
+                        }
+                        {
+                            this.createSelect3()
+                        }
+                    <input type='submit' value="Submit" />
+                    </form>
+                </div> 
             </div>
-            <div className="container">
-                {/* <h3>Optional Courses</h3>
-                 */}
-                 {
-                     this.optionalCoursesHeader()
-                 }
-                <form onSubmit={this.onSubmit}>
-                    {
-                        this.createSelect0()
-                    }
-                    {
-                        this.createSelect1()
-                    }
-                    {
-                        this.createSelect2()
-                    }
-                    {
-                        this.createSelect3()
-                    }
-                <input type='submit' value="Submit" />
-                </form>
-            </div> 
-        </div>
-        );
+            );
+        }
+        else {
+            return (<div>
+                <NavbarClass/>
+                <div className="container">
+                    <h3>You Have Already Registered for upcoming Semester!</h3>
+                </div>
+            </div>)
+        }
     }
 }
