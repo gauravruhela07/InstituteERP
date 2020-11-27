@@ -4,8 +4,9 @@ import Select from 'react-select';
 // import { FormControl } from 'react-bootstrap';
 // import Course from '../../../backend/models/course.model';
 
-import NavbarClass from './postlogin_navbar.component';
-import Login from './student.login';
+// import NavbarClass from './postlogin_navbar.component';
+// import Login from './student.login';
+
 
 
 const CourseTable = (props) => (
@@ -13,7 +14,6 @@ const CourseTable = (props) => (
         <td>{props.course.course_name}</td>
         <td>{props.course.course_id}</td>
         <td>{props.course.department}</td>
-        {/* <td>{props.course.elective}</td> */}
     </tr>
 )
 export default class Registration extends Component {
@@ -166,6 +166,7 @@ export default class Registration extends Component {
                 value={selectedOption}
                 onChange={this.handleChange}
                 options={options}
+                required
             /><br/></div>)
         }
     }
@@ -211,6 +212,7 @@ export default class Registration extends Component {
             value={selectedOption}
             onChange={this.handleChange3}
             options={options}
+            
         /><br/></div>)
         }
     }
@@ -218,6 +220,7 @@ export default class Registration extends Component {
     
     onSubmit(e) {
         // console.log(this.state.courses.length);
+        var group = this.groupByOptional();
         e.preventDefault();
         var course_id_list = [];
         var course_name_list = [];
@@ -230,6 +233,7 @@ export default class Registration extends Component {
             }
         }
 
+        var len = course_id_list.length;
         // electives that the student has chosen
         if(this.state.selectedOption!=null){
             course_id_list.push(this.state.selectedOption.value);
@@ -247,33 +251,39 @@ export default class Registration extends Component {
             course_id_list.push(this.state.selectedOption3.value);
             course_name_list.push(this.state.selectedOption3.label);
         }
-        axios.post("http://localhost:5000/student_subject/current_sem",
-         {roll_num:localStorage.getItem('roll_num')},
-         {
-             headers: {
-                 'authorization':localStorage.getItem('token')
-             }
-         })
-        .then(res => {
-            const data = {
-                roll_num:localStorage.getItem('roll_num'),
-                semester_num:res.data,
-                course_id_list:course_id_list,
-                course_name_list:course_name_list,
-                hasRegistered:"1"
-            }
-            console.log(data)
-            axios.post('http://localhost:5000/student_subject/registerWithElective', data, {
-                headers: {
-                    'authorization':localStorage.getItem('token')
+        var len1 = course_id_list.length;
+        if(len==len1 && group.length!==0) {
+            return ;
+        }
+        if(course_id_list.length!==0) {
+            axios.post("http://localhost:5000/student_subject/current_sem",
+                {roll_num:localStorage.getItem('roll_num')},
+                {
+                    headers: {
+                        'authorization':localStorage.getItem('token')
+                    }
+                })
+            .then(res => {
+                const data = {
+                    roll_num:localStorage.getItem('roll_num'),
+                    semester_num:res.data,
+                    course_id_list:course_id_list,
+                    course_name_list:course_name_list,
+                    hasRegistered:"1"
                 }
+                console.log(data)
+                axios.post('http://localhost:5000/student_subject/registerWithElective', data, {
+                    headers: {
+                        'authorization':localStorage.getItem('token')
+                    }
+                })
+                .then(res => console.log(res.data))
+                .catch(err => console.log('Error: '+err));
             })
-            .then(res => console.log(res.data))
-            .catch(err => console.log('Error: '+err));
-        })
-        .catch(err => console.log('Error: '+err)) 
+            .catch(err => console.log('Error: '+err)) 
 
-        window.location = '/student/thanks';
+            window.location = '/student/thanks';
+        }
     }
     optionalCoursesHeader(){
         const group = this.groupByOptional();
@@ -283,18 +293,10 @@ export default class Registration extends Component {
     }
 
     render() {
-        if(this.state.loggedIn===false){
-            this.props.history.push('/student/login');
-            return (
-                <div>
-                    <Login/>
-                </div>
-            );
-        }
     if(this.state.hasRegistered==-1) {
         return (
             <div>
-                <NavbarClass/>
+                {/* <NavbarClass/> */}
                 <div className="container">
                     <h3>Mandatory Courses</h3>
                     <table className="table">
@@ -318,6 +320,7 @@ export default class Registration extends Component {
                         this.optionalCoursesHeader()
                     }
                     <form onSubmit={this.onSubmit}>
+                    <div className="form-group"> 
                         {
                             this.createSelect0()
                         }
@@ -330,7 +333,10 @@ export default class Registration extends Component {
                         {
                             this.createSelect3()
                         }
-                    <input type='submit' value="Submit" />
+                    </div>
+                    <div className="form-group-button-edit">
+                    <input type='submit' value="Submit" className="btn btn-primary" />
+                    </div>
                     </form>
                 </div> 
             </div>
@@ -338,9 +344,9 @@ export default class Registration extends Component {
         }
         else {
             return (<div>
-                <NavbarClass/>
+                {/* <NavbarClass/> */}
                 <div className="container">
-                    <h3>You Have Already Registered for upcoming Semester!</h3>
+                    <h3>You Have Already Registered for Upcoming Semester!</h3>
                 </div>
             </div>)
         }

@@ -109,7 +109,8 @@ router.post('/current_sem', checkAuth, (req, res) => {
                 max_sem=msg.semester_num;
             }
         });
-        res.json(max_sem+1);
+        max_sem = (Number(max_sem)+1).toString();
+        res.json(max_sem);
     })
     .catch(err => res.status(400).json('Error: '+res));
 })
