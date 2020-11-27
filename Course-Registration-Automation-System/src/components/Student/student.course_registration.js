@@ -32,7 +32,10 @@ export default class Registration extends Component {
             selectedOption1:null,
             selectedOption2:null,
             selectedOption3:null, 
-            hasRegistered:"1"
+            semester_transaction_id:"",
+            semester_amount:"",
+            mess_transaction_id:"",
+            mess_amount:""
         }
 
         this.courseList = this.courseList.bind(this);
@@ -49,6 +52,10 @@ export default class Registration extends Component {
         this.createSelect2 = this.createSelect2.bind(this);
         this.createSelect3 = this.createSelect3.bind(this);
         this.optionalCoursesHeader = this.optionalCoursesHeader.bind(this);
+        this.sem_transaction = this.sem_transaction.bind(this);
+        this.sem_amount = this.sem_amount.bind(this);
+        this.mess_transaction = this.mess_transaction.bind(this);
+        this.onChangeMessAmount = this.onChangeMessAmount.bind(this);
     }
 
     componentDidMount() {
@@ -74,17 +81,6 @@ export default class Registration extends Component {
             }
             this.setState({courses:courses});
         })
-        .catch(err => {
-            console.log(err);
-        })
-
-        // post request for fetching registeration status
-        axios.post("http://localhost:5000/student_subject/checkRegisteration", data, {
-            headers: {
-                'authorization':localStorage.getItem('token')
-            }
-        })
-        .then(res => this.setState({hasRegistered:res.data}))
         .catch(err => {
             console.log(err);
         })
@@ -269,19 +265,36 @@ export default class Registration extends Component {
                     semester_num:res.data,
                     course_id_list:course_id_list,
                     course_name_list:course_name_list,
-                    hasRegistered:"1"
+                    hasRegistered:"0",
                 }
-                console.log(data)
+                // console.log(data)
                 axios.post('http://localhost:5000/student_subject/registerWithElective', data, {
                     headers: {
                         'authorization':localStorage.getItem('token')
                     }
                 })
-                .then(res => console.log(res.data))
+                .then(res => {
+                    // console.log(res.data);
+                    const data1 = {
+                        roll_num:localStorage.getItem('roll_num'),
+                        semester_num:data.semester_num,
+                        semester_transaction_id:this.state.semester_transaction_id,
+                        semester_amount:this.state.semester_amount,
+                        mess_transaction_id:this.state.mess_transaction_id,
+                        mess_amount:this.state.mess_amount
+                    }
+                    console.log(data1);
+                    axios.post('http://localhost:5000/student_subject/upload_fees', data1, {
+                        headers: {
+                            'authorization':localStorage.getItem('token')
+                        }
+                    })
+                    .then(res => console.log(res))
+                    .catch(err => console.log('Error: '+err));
+                })
                 .catch(err => console.log('Error: '+err));
             })
-            .catch(err => console.log('Error: '+err)) 
-
+            .catch(err => console.log('Error: '+err))
             window.location = '/student/thanks';
         }
     }
@@ -291,9 +304,22 @@ export default class Registration extends Component {
             return <h3>Optional Courses</h3>
         }
     }
+    sem_transaction(e) {
+        this.setState({semester_transaction_id:e.target.value});
+    }
+    sem_amount(e) {
+        this.setState({semester_amount:e.target.value});
+    }
+    mess_transaction(e) {
+        this.setState({mess_transaction_id:e.target.value});
+    }
+    onChangeMessAmount(e) {
+        this.setState({mess_amount:e.target.value});
+    }
+
+
 
     render() {
-    if(this.state.hasRegistered==-1) {
         return (
             <div>
                 {/* <NavbarClass/> */}
@@ -334,21 +360,55 @@ export default class Registration extends Component {
                             this.createSelect3()
                         }
                     </div>
-                    <div className="form-group-button-edit">
-                    <input type='submit' value="Submit" className="btn btn-primary" />
+                    <h4>Semester Fees Records</h4>
+                    <div className="form-group">
+                        <label>Transaction ID: </label>
+                        <input
+                            required
+                            className="form-control"
+                            type="text"
+                            value={this.state.semester_transaction_id}
+                            onChange={this.sem_transaction}
+                        />
                     </div>
+                    <div className="form-group">
+                        <label>Amount: </label>
+                        <input
+                            required
+                            className="form-control"
+                            type="text"
+                            value={this.state.semester_amount}
+                            onChange={this.sem_amount}
+                        />
+                    </div>
+                    <h4>Mess Fees Records</h4>
+                    <div className="form-group">
+                        <label>Transaction ID: </label>
+                        <input
+                            required
+                            className="form-control"
+                            type="text"
+                            value={this.state.mess_transaction_id}
+                            onChange={this.mess_transaction}
+                        />
+                    </div>
+                    <div className="form-group">
+                        <label>Amount: </label>
+                        <input
+                            required
+                            className="form-control"
+                            type="text"
+                            value={this.state.mess_amount}
+                            onChange={this.onChangeMessAmount}
+                        />
+                    </div>
+                    <div className="form-group-button-edit">
+                        <input type='submit' value="Submit" className="btn btn-primary" />
+                    </div>
+                    
                     </form>
                 </div> 
             </div>
-            );
-        }
-        else {
-            return (<div>
-                {/* <NavbarClass/> */}
-                <div className="container">
-                    <h3>You Have Already Registered for Upcoming Semester!</h3>
-                </div>
-            </div>)
-        }
+        );
     }
 }
