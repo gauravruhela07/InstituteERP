@@ -33,9 +33,7 @@ export default class Registration extends Component {
             selectedOption2:null,
             selectedOption3:null, 
             semester_transaction_id:"",
-            semester_amount:"",
-            mess_transaction_id:"",
-            mess_amount:""
+            mess_transaction_id:""
         }
 
         this.courseList = this.courseList.bind(this);
@@ -53,9 +51,7 @@ export default class Registration extends Component {
         this.createSelect3 = this.createSelect3.bind(this);
         this.optionalCoursesHeader = this.optionalCoursesHeader.bind(this);
         this.sem_transaction = this.sem_transaction.bind(this);
-        this.sem_amount = this.sem_amount.bind(this);
         this.mess_transaction = this.mess_transaction.bind(this);
-        this.onChangeMessAmount = this.onChangeMessAmount.bind(this);
     }
 
     componentDidMount() {
@@ -248,6 +244,8 @@ export default class Registration extends Component {
             course_name_list.push(this.state.selectedOption3.label);
         }
         var len1 = course_id_list.length;
+
+        // will disable the submit button until optional is selected
         if(len==len1 && group.length!==0) {
             return ;
         }
@@ -279,9 +277,8 @@ export default class Registration extends Component {
                         roll_num:localStorage.getItem('roll_num'),
                         semester_num:data.semester_num,
                         semester_transaction_id:this.state.semester_transaction_id,
-                        semester_amount:this.state.semester_amount,
                         mess_transaction_id:this.state.mess_transaction_id,
-                        mess_amount:this.state.mess_amount
+                        department: localStorage.getItem('department')
                     }
                     console.log(data1);
                     axios.post('http://localhost:5000/student_subject/upload_fees', data1, {
@@ -291,11 +288,12 @@ export default class Registration extends Component {
                     })
                     .then(res => console.log(res))
                     .catch(err => console.log('Error: '+err));
+                    window.location = '/student/thanks';
                 })
                 .catch(err => console.log('Error: '+err));
             })
             .catch(err => console.log('Error: '+err))
-            window.location = '/student/thanks';
+            
         }
     }
     optionalCoursesHeader(){
@@ -307,14 +305,8 @@ export default class Registration extends Component {
     sem_transaction(e) {
         this.setState({semester_transaction_id:e.target.value});
     }
-    sem_amount(e) {
-        this.setState({semester_amount:e.target.value});
-    }
     mess_transaction(e) {
         this.setState({mess_transaction_id:e.target.value});
-    }
-    onChangeMessAmount(e) {
-        this.setState({mess_amount:e.target.value});
     }
 
 
@@ -371,16 +363,6 @@ export default class Registration extends Component {
                             onChange={this.sem_transaction}
                         />
                     </div>
-                    <div className="form-group">
-                        <label>Amount: </label>
-                        <input
-                            required
-                            className="form-control"
-                            type="text"
-                            value={this.state.semester_amount}
-                            onChange={this.sem_amount}
-                        />
-                    </div>
                     <h4>Mess Fees Records</h4>
                     <div className="form-group">
                         <label>Transaction ID: </label>
@@ -390,16 +372,6 @@ export default class Registration extends Component {
                             type="text"
                             value={this.state.mess_transaction_id}
                             onChange={this.mess_transaction}
-                        />
-                    </div>
-                    <div className="form-group">
-                        <label>Amount: </label>
-                        <input
-                            required
-                            className="form-control"
-                            type="text"
-                            value={this.state.mess_amount}
-                            onChange={this.onChangeMessAmount}
                         />
                     </div>
                     <div className="form-group-button-edit">

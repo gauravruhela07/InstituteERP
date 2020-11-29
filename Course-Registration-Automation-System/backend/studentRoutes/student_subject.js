@@ -29,7 +29,6 @@ router.post('/add', checkAuth, (req, res) => {
 
 router.post('/registerWithElective', checkAuth, (req, res) => {
     var len = req.body.course_id_list.length;
-    console.log(req.body);
     for(var i=0; i<len; i++) {
         var newStudent_Subject = new Student_Subject({
             roll_num:req.body.roll_num,
@@ -49,30 +48,31 @@ router.post('/registerWithElective', checkAuth, (req, res) => {
 });
 
 router.post('/upload_fees', checkAuth, (req, res) => {
-    var fees_type = "semester_fee";
-    console.log(req.body);
-    var newFeesRecord = new StudentFeesRecord({
-        roll_num:req.body.roll_num,
-        semester_num:req.body.semester_num,
-        transaction_id:req.body.semester_transaction_id,
-        amount:req.body.semester_amount,
-        fee_type:fees_type
-    });
-    console.log(newFeesRecord);
-    newFeesRecord.save()
-    .then(() => {
-        console.log(fees_type);    
-        var mess_type = "mess_fee";
-        var newFeesRecord1 = new StudentFeesRecord({
-            roll_num:req.body.roll_num,
-            semester_num:req.body.semester_num,
-            transaction_id:req.body.mess_transaction_id,
-            amount: req.body.mess_amount,
-            fee_type: mess_type
-        });
-        newFeesRecord1.save()
-        .then(() => res.json('Successful!'))
-        .catch(err => res.status(400).json('Error: '+res));
+    
+    const query = {roll_num: req.body.roll_num, semester_num:req.body.semester_num}
+    const args = {$set: {"semester_transaction_id_student": req.body.semester_transaction_id,
+                         "mess_transaction_id_student":req.body.mess_transaction_id}};
+    StudentFeesRecord.find(query)
+    .then(student => {
+        if(student.length===0) {
+            var newStudentFeesRecord = new StudentFeesRecord({
+                roll_num:req.body.roll_num,
+                semester_num:req.body.semester_num,
+                semester_transaction_id_student:req.body.semester_transaction_id,
+                mess_transaction_id_student: req.body.mess_transaction_id,
+                semester_transaction_id_finance: Math.random().toString(),
+                mess_transaction_id_finance: Math.random().toString(),
+                department: req.body.department
+            });
+            newStudentFeesRecord.save()
+            .then(() => res.json('Successfully Added'))
+            .catch(err => console.log(err));
+        }
+        else {
+            StudentFeesRecord.updateOne(query, args)
+            .then(() => res.json('Updated!'))
+            .catch(err => res.status(400).json('Error: '+res));
+        }
     })
     .catch(err => res.status(400).json('Error: '+res));
 });
