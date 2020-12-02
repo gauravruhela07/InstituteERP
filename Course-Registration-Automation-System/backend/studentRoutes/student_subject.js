@@ -1,5 +1,9 @@
 const router = require('express').Router();
+const bcrypt = require('bcrypt');
 const checkAuth = require('../middleware/check_auth_student');
+
+var salt = 7;
+var secret_key = "secret_key_student";
 
 const Student = require('../models/student.model');
 const Student_Subject = require('../models/student_subject.model');
@@ -25,6 +29,40 @@ router.post('/add', checkAuth, (req, res) => {
     newStudent_Subject.save()
     .then(() => res.json('Student Subject Added!'))
     .catch(err => res.status(400).json('Error: '+res))
+});
+
+router.post('/changePassword', checkAuth, (req, res) => {
+    Student.find({roll_num: req.body.roll_num})
+    .exec()
+    .then(student => {
+        if(student.length<1) {
+            return res.status(401).json({
+                message: 'Auth Failed'
+            });
+        }
+        bcrypt.compare(req.body.password, student[0].password, (err, result) => {
+            if(err) {
+                return res.json({
+                    message: "Incorrect Password"
+                });
+            }
+            if(result) {
+                bcrypt.hash(req.body.changed_password, salt, (err, hash) => {
+                    if(err) {
+                        return res.status(500).json({error:err});
+                    }
+                    else {
+                        const query = {roll_num: req.body.roll_num};
+                        const args = {$set : {"password":hash}};
+                        Student.updateOne(query, args)
+                        .then(() => res.json('Password Changed Successfully'))
+                        .catch(err => res.status(400).json('Error: '+res));
+                    }
+                });
+            }
+        });
+    })
+    .catch(err => res.status(400).json('Error: '+err));
 })
 
 router.post('/registerWithElective', checkAuth, (req, res) => {

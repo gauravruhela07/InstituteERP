@@ -377,7 +377,6 @@ export default class Registration extends Component {
                     <div className="form-group-button-edit">
                         <input type='submit' value="Submit" className="btn btn-primary" />
                     </div>
-                    
                     </form>
                 </div> 
             </div>

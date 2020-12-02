@@ -12,6 +12,7 @@ export default class NavbarClass extends Component {
                     <Nav className="mr-auto">
                         <Nav.Link href="/student/home">About</Nav.Link>
                         <Nav.Link href="/student/course_registration">Registration</Nav.Link>
+                        <Nav.Link href="/student/change_password">Change Password</Nav.Link>
                     </Nav>
                     <Nav>
                         <Nav.Link href="/student/logout">LogOut</Nav.Link>
