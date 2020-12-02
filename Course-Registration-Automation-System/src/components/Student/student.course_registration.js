@@ -14,6 +14,10 @@ const CourseTable = (props) => (
         <td>{props.course.course_name}</td>
         <td>{props.course.course_id}</td>
         <td>{props.course.department}</td>
+        <td>{props.course.L}</td>
+        <td>{props.course.T}</td>
+        <td>{props.course.P}</td>
+        <td>{props.course.C}</td>
     </tr>
 )
 export default class Registration extends Component {
@@ -323,6 +327,10 @@ export default class Registration extends Component {
                                 <th>Course Name</th>
                                 <th>Course ID</th>
                                 <th>Department</th>
+                                <th>L</th>
+                                <th>T</th>
+                                <th>P</th>
+                                <th>C</th>
                                 {/* <th>Elective</th> */}
                             </tr>
                         </thead>
