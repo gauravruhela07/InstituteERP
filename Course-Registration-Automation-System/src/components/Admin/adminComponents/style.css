@@ -1,0 +1,38 @@
+
+    .content-table {
+        border-collapse: collapse;
+        /* margin: 25px 0; */
+        min-width: 400px;
+        margin-left: auto;
+        margin-right: auto;
+    }
+
+    .content-table thead tr{
+        text-align: left;
+        font-weight: bold;
+        font-size: 1em;
+    }
+
+    .content-table th, .content-table td{
+        padding: 12px 15px;
+        font-size: 1em;
+    }
+
+    .content-table tbody tr {
+        border-bottom: 1px solid #dddddd;
+    }
+
+    .content-table tbody tr: last-of-type {
+        border-bottom: 2px solid #009879;
+    }
+
+    h3{
+      /* margin-left: auto;
+      margin-right: auto; */
+      text-align: center;
+      font-size: 1.4em;
+  }
+
+  nav{
+      margin: 0px 0px 0px 0px;
+  }

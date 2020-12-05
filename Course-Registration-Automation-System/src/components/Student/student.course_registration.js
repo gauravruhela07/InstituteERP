@@ -4,8 +4,9 @@ import Select from 'react-select';
 // import { FormControl } from 'react-bootstrap';
 // import Course from '../../../backend/models/course.model';
 
-import NavbarClass from './postlogin_navbar.component';
-import Login from './student.login';
+// import NavbarClass from './postlogin_navbar.component';
+// import Login from './student.login';
+
 
 
 const CourseTable = (props) => (
@@ -13,7 +14,6 @@ const CourseTable = (props) => (
         <td>{props.course.course_name}</td>
         <td>{props.course.course_id}</td>
         <td>{props.course.department}</td>
-        {/* <td>{props.course.elective}</td> */}
     </tr>
 )
 export default class Registration extends Component {
@@ -31,7 +31,8 @@ export default class Registration extends Component {
             selectedOption:null,
             selectedOption1:null,
             selectedOption2:null,
-            selectedOption3:null
+            selectedOption3:null, 
+            hasRegistered:"1"
         }
 
         this.courseList = this.courseList.bind(this);
@@ -47,6 +48,7 @@ export default class Registration extends Component {
         this.createSelect1 = this.createSelect1.bind(this);
         this.createSelect2 = this.createSelect2.bind(this);
         this.createSelect3 = this.createSelect3.bind(this);
+        this.optionalCoursesHeader = this.optionalCoursesHeader.bind(this);
     }
 
     componentDidMount() {
@@ -72,6 +74,17 @@ export default class Registration extends Component {
             }
             this.setState({courses:courses});
         })
+        .catch(err => {
+            console.log(err);
+        })
+
+        // post request for fetching registeration status
+        axios.post("http://localhost:5000/student_subject/checkRegisteration", data, {
+            headers: {
+                'authorization':localStorage.getItem('token')
+            }
+        })
+        .then(res => this.setState({hasRegistered:res.data}))
         .catch(err => {
             console.log(err);
         })
@@ -102,6 +115,7 @@ export default class Registration extends Component {
             if(course.elective > -1) {
                 optionalSet.add(course.elective)
             }
+            // console.log(course.elective);
         });
         var group = [];
         for(let elective of optionalSet) {
@@ -134,8 +148,10 @@ export default class Registration extends Component {
         if(this.state.courses.length==0)
             return options;
         var group = this.groupByOptional();
+        if(group.length==0){
+            return -1;
+        }
         group[i].map(course => options.push({value:course.course_id, label:course.course_name}));
-        // course.map(course => options.push({value:course.course_name, label:course.course_name}));
         return options;
     }
 
@@ -145,11 +161,14 @@ export default class Registration extends Component {
         }
         const selectedOption = this.state.selectedOption;
         const options = this.convToOptions(0);
-        return (<div><label>Elective 1:</label><Select
-            value={selectedOption}
-            onChange={this.handleChange}
-            options={options}
-        /><br/></div>)
+        if(options!==-1){
+            return (<div><label>Elective 1:</label><Select
+                value={selectedOption}
+                onChange={this.handleChange}
+                options={options}
+                required
+            /><br/></div>)
+        }
     }
     createSelect1(){
         if(this.state.courses.length==0){
@@ -193,24 +212,28 @@ export default class Registration extends Component {
             value={selectedOption}
             onChange={this.handleChange3}
             options={options}
+            
         /><br/></div>)
         }
     }
 
     
     onSubmit(e) {
+        // console.log(this.state.courses.length);
+        var group = this.groupByOptional();
         e.preventDefault();
         var course_id_list = [];
         var course_name_list = [];
 
         // mandatory courses
         for(var i=0; i<this.state.courses.length; i++){
-            if(this.state.courses[i].elective===-1) {
+            if(this.state.courses[i].elective==-1) {
                 course_id_list.push(this.state.courses[i].course_id);
                 course_name_list.push(this.state.courses[i].course_name);
             }
         }
 
+        var len = course_id_list.length;
         // electives that the student has chosen
         if(this.state.selectedOption!=null){
             course_id_list.push(this.state.selectedOption.value);
@@ -228,82 +251,104 @@ export default class Registration extends Component {
             course_id_list.push(this.state.selectedOption3.value);
             course_name_list.push(this.state.selectedOption3.label);
         }
-        axios.post("http://localhost:5000/student_subject/current_sem",
-         {roll_num:localStorage.getItem('roll_num')},
-         {
-             headers: {
-                 'authorization':localStorage.getItem('token')
-             }
-         })
-        .then(res => {
-            const data = {
-                roll_num:localStorage.getItem('roll_num'),
-                semester_num:res.data,
-                course_id_list:course_id_list,
-                course_name_list:course_name_list
-            }
-            console.log(data)
-            axios.post('http://localhost:5000/student_subject/registerWithElective', data, {
-                headers: {
-                    'authorization':localStorage.getItem('token')
+        var len1 = course_id_list.length;
+        if(len==len1 && group.length!==0) {
+            return ;
+        }
+        if(course_id_list.length!==0) {
+            axios.post("http://localhost:5000/student_subject/current_sem",
+                {roll_num:localStorage.getItem('roll_num')},
+                {
+                    headers: {
+                        'authorization':localStorage.getItem('token')
+                    }
+                })
+            .then(res => {
+                const data = {
+                    roll_num:localStorage.getItem('roll_num'),
+                    semester_num:res.data,
+                    course_id_list:course_id_list,
+                    course_name_list:course_name_list,
+                    hasRegistered:"1"
                 }
+                console.log(data)
+                axios.post('http://localhost:5000/student_subject/registerWithElective', data, {
+                    headers: {
+                        'authorization':localStorage.getItem('token')
+                    }
+                })
+                .then(res => console.log(res.data))
+                .catch(err => console.log('Error: '+err));
             })
-            .then(res => console.log(res.data))
-            .catch(err => console.log('Error: '+err));
-        })
-        .catch(err => console.log('Error: '+err)) 
-        const data = {
-            roll_num:localStorage.getItem('roll_num')
+            .catch(err => console.log('Error: '+err)) 
+
+            window.location = '/student/thanks';
+        }
+    }
+    optionalCoursesHeader(){
+        const group = this.groupByOptional();
+        if(group.length!==0){
+            return <h3>Optional Courses</h3>
         }
     }
 
     render() {
-        if(this.state.loggedIn===false){
-            this.props.history.push('/student/login');
-            return (
-                <div>
-                    <Login/>
+    if(this.state.hasRegistered==-1) {
+        return (
+            <div>
+                {/* <NavbarClass/> */}
+                <div className="container">
+                    <h3>Mandatory Courses</h3>
+                    <table className="table">
+                        <thead className="thead-light">
+                            <tr>
+                                <th>Course Name</th>
+                                <th>Course ID</th>
+                                <th>Department</th>
+                                {/* <th>Elective</th> */}
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {this.courseList()}
+                        </tbody>
+                    </table>
                 </div>
+                <div className="container">
+                    {/* <h3>Optional Courses</h3>
+                    */}
+                    {
+                        this.optionalCoursesHeader()
+                    }
+                    <form onSubmit={this.onSubmit}>
+                    <div className="form-group"> 
+                        {
+                            this.createSelect0()
+                        }
+                        {
+                            this.createSelect1()
+                        }
+                        {
+                            this.createSelect2()
+                        }
+                        {
+                            this.createSelect3()
+                        }
+                    </div>
+                    <div className="form-group-button-edit">
+                    <input type='submit' value="Submit" className="btn btn-primary" />
+                    </div>
+                    </form>
+                </div> 
+            </div>
             );
         }
-    return (
-        <div>
-            <NavbarClass/>
-            <div className="container">
-                <h3>Mandatory Courses</h3>
-                <table className="table">
-                    <thead className="thead-light">
-                        <tr>
-                            <th>Course Name</th>
-                            <th>Course ID</th>
-                            <th>Department</th>
-                            {/* <th>Elective</th> */}
-                        </tr>
-                    </thead>
-                    <tbody>
-                        {this.courseList()}
-                    </tbody>
-                </table>
-            </div>
-            <div className="container">
-                <h3>Optional Courses</h3>
-                <form onSubmit={this.onSubmit}>
-                    {
-                        this.createSelect0()
-                    }
-                    {
-                        this.createSelect1()
-                    }
-                    {
-                        this.createSelect2()
-                    }
-                    {
-                        this.createSelect3()
-                    }
-                <input type='submit' value="Submit" />
-                </form>
-            </div> 
-        </div>
-        );
+        else {
+            return (<div>
+                {/* <NavbarClass/> */}
+                <div className="container">
+                    <h3>You Have Already Registered for Upcoming Semester!</h3>
+                </div>
+            </div>)
+        }
     }
 }

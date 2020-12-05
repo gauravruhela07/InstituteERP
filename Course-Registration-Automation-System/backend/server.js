@@ -52,9 +52,19 @@ app.use('/student_subject', student_subjectRouter);
 // Admin
 const coursesRouter = require('./adminRoutes/coursesCRUD');
 const facultyRouter = require('./adminRoutes/facultyCRUD');
+const adminCredRouter = require('./adminRoutes/adminCredCRUD');
+const student_Router = require('./adminRoutes/studentCRUD');
+const teaches_Router = require('./adminRoutes/teachesCRUD');
+const feeRouter = require('./adminRoutes/studentFeesCRUD');
+
 
 app.use('/course', coursesRouter);
 app.use('/faculty', facultyRouter);
+app.use('/adminCred', adminCredRouter);
+app.use('/student', student_Router);
+// app.use('/studentSub', studentSubject_Router);
+app.use('/teaches', teaches_Router);
+app.use('/fee', feeRouter);
 
 
 app.listen(port, () => {

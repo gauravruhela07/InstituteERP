@@ -2,6 +2,7 @@ import React, { Component } from "react";
 import { useState, useEffect } from "react";
 import axios from 'axios';
 import Select from 'react-select';
+import NavBarAfterLoginPage from "./navbarAfterLogin";
 
 const Course = () => {
   console.log("rendering");
@@ -295,6 +296,9 @@ const Course = () => {
 
   return (
     <div>
+      <div className="container">
+        <NavBarAfterLoginPage />
+      </div>
       <div>
         <table className="table">
           <thead className="thead-light">
