@@ -10,7 +10,7 @@ router.route('/getAdmin').post((req, res) => {
     // console.log(adminId);
     Faculty.find({ 'faculty_id': adminId })
         .then(admin => {
-            console.log(admin);
+            // console.log(admin);
             res.json(admin);
         })
         .catch(err => res.status(400).json('Error: ' + err));
@@ -21,54 +21,71 @@ router.route('/getAdmin').post((req, res) => {
 router.route('/add').post((req, res) => {
     var facultyArray = req.body.theArray;
     var i;
-    for (i=0;i<facultyArray.length;i++){
-        const name = facultyArray[i]["name"];
-        const faculty_id = facultyArray[i]["faculty_id"];
-        const department = facultyArray[i]["department"];
-        const admin = facultyArray[i]["admin"];
-        const hod = facultyArray[i]["HOD"];
-        const advisor = facultyArray[i]["Advisor"];
-        console.log(advisor);
-        if (advisor==="yes"){
-            const advisory_sem = facultyArray[i]["advisory_sem"];
-            const advisory_branch = facultyArray[i]["advisory_branch"];
-            const advisory_program = facultyArray[i]["advisory_program"];
-            const advisorString = advisory_sem+","+advisory_branch+","+advisory_program;
+    let p = new Promise((resolve, reject) => {
+        counter = 0;
+        for (i = 0; i < facultyArray.length; i++) {
+            const name = facultyArray[i]["name"];
+            const faculty_id = facultyArray[i]["faculty_id"];
+            const department = facultyArray[i]["department"];
+            const admin = facultyArray[i]["admin"];
+            const hod = facultyArray[i]["HOD"];
+            const advisor = facultyArray[i]["Advisor"];
+            if (advisor === "yes") {
+                const advisory_sem = facultyArray[i]["advisory_sem"];
+                const advisory_branch = facultyArray[i]["advisory_branch"];
+                const advisory_program = facultyArray[i]["advisory_program"];
+                const advisorString = advisory_sem + "," + advisory_branch + "," + advisory_program;
 
-            const faculty = new Faculty({ "name": name, "faculty_id": faculty_id, "department": department, "admin": admin, "HOD": hod, "Advisor": advisorString });
+                const faculty = new Faculty({ "name": name, "faculty_id": faculty_id, "department": department, "admin": admin, "HOD": hod, "Advisor": advisorString });
 
-            faculty.save()
-                .then(() => console.log('faculty added!'))
-                .catch(err => res.status(400).json('Error: ' + err));
+                faculty.save()
+                    .then(() => { counter++; return counter; })
+                    .then((counter) => {
+                        if (counter == facultyArray.length - 1) {
+                            resolve()
+                        }
+                    })
+                    .catch(err => reject());
+            }
+            else if (advisor === "no") {
+                const faculty = new Faculty({ "name": name, "faculty_id": faculty_id, "department": department, "admin": admin, "HOD": hod, "Advisor": " " });
+
+                faculty.save()
+                    .then(() => { counter++; return counter })
+                    .then((counter) => {
+                        if (counter == facultyArray.length - 1) {
+                            resolve()
+                        }
+                    })
+                    .catch(err => reject());
+            }
+
         }
-        else if(advisor==="no"){
-            const faculty = new Faculty({ "name": name, "faculty_id": faculty_id, "department": department, "admin": admin, "HOD": hod, "Advisor": " "});
+    })
 
-            faculty.save()
-                .then(() => console.log('faculty added!'))
-                .catch(err => res.status(400).json('Error: ' + err));
-        }
 
-    }
-    
+    p.then(() => {
+        res.json({
+            message: "successful"
+        })
+    }).catch(() => {
+        res.json({
+            message: "unsuccessful"
+        })
+    })
 });
-
 
 router.route('/getFacultyId').post((req, res) => {
     const name = req.body.faculty_name;
 
-    var query = {"name": name}
+    var query = { "name": name }
     Faculty.find(query)
         .then(result => {
-            // console.log(name+"  "+result+" "+typeof(result)+" "+Object.keys(result)[1]);
-            // console.log(name);
-            // console.log(result[0].faculty_id);
-            // console.log(result.length);
+            // console.log("getFacultyId " + name + " " + String(result[0].faculty_id))
             res.json({
                 name: name,
                 faculty_id: result[0].faculty_id
             })
-            // res.json(result);
         })
         .catch(err => res.status(400).json('Error issssssssssssssssssss: ' + err));
 });

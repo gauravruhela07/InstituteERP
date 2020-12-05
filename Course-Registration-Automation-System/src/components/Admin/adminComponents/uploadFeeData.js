@@ -8,7 +8,7 @@ export default class uploadStudentData extends Component {
         super(props);
 
         this.state = {
-            arrayOfFee : [],
+            arrayOfFee: [],
             isFeeUpdated: 0
         }
 
@@ -16,31 +16,35 @@ export default class uploadStudentData extends Component {
         this.onClick = this.onClick.bind(this);
     };
 
-    componentDidMount(){
+    componentDidMount() {
         // console.log("inside componentdidmount");
         axios.get('http://localhost:5000/fee/getAllFeeDetails')
             .then(result => {
-                // console.log(result.data.arrayOfFees);
                 var arr = result.data.arrayOfFees;
-                if (arr.length>0){
+                console.log(arr);
+                if (arr.length > 0) {
                     this.setState({
                         arrayOfFee: arr,
                         isFeeUpdated: 0
                     })
                 }
-                
+
             })
     }
 
-    componentDidUpdate(prevProps, prevState, snapShot){
-        // console.log("inside componentdidupdate");
-        // console.log(this.state.isFeeUpdated);
-        if (this.state.isFeeUpdated===1){
-            axios.post('http://localhost:5000/fee/addFinanceDeptFee', {theArray: this.state.arrayOfFee})
-            .then(() => {
-                console.log("Fee added successfully");
-            })
-            .catch(err => console.log("Error", err))
+    componentDidUpdate(prevProps, prevState, snapShot) {
+        if (this.state.isFeeUpdated === 1) {
+            // console.log("inside componentdidupdate and if");
+            axios.post('http://localhost:5000/fee/addFinanceDeptFee', { theArray: this.state.arrayOfFee })
+                .then((result) => {
+                    if (result.data.message === "successful") {
+                        console.log("Insertion of fee successful")
+                    }
+                    else if (result.data.message === "unsuccessful") {
+                        console.log("Not inserted");
+                    }
+                })
+                .catch(err => console.log("Error", err))
         }
     }
 
@@ -89,8 +93,10 @@ export default class uploadStudentData extends Component {
                     <table className="content-table">
                         <thead>
                             <tr>
+                                <th>name</th>
                                 <th>Roll No.</th>
                                 <th>Semester Number</th>
+                                <th>department</th>
                                 <th>semester fee transaction id</th>
                                 <th>mess fee transaction id</th>
                             </tr>
@@ -99,8 +105,10 @@ export default class uploadStudentData extends Component {
                             {this.state.arrayOfFee.map((fee) => {
                                 return (
                                     <tr>
+                                        <th>{fee["name"]}</th>
                                         <td>{fee["roll_num"]}</td>
                                         <td>{fee["semester_num"]}</td>
+                                        <th>{fee["department"]}</th>
                                         <td>{fee["semester_transaction_id_finance"]}</td>
                                         <td>{fee["mess_transaction_id_finance"]}</td>
                                     </tr>

@@ -41,7 +41,7 @@ router.route('/add').post((req, res) => {
     const semester_num = req.body.semester_num;
     const dept_alloted = req.body.dept_alloted;
 
-    const courses = new Course({ "course_name": course_name, "course_id": course_id, "department": department, "elective": elective, "semester_num": semester_num, "dept_alloted":dept_alloted });
+    const courses = new Course({ "course_name": course_name, "course_id": course_id, "department": department, "elective": elective, "semester_num": semester_num, "dept_alloted": dept_alloted });
 
     courses.save()
         .then(() => res.json('course added!'))
@@ -88,34 +88,57 @@ router.route('/updateElective/').post((req, res) => {
 router.route('/insertCourse').post((req, res) => {
     var courseArray = req.body.theArray;
     var i;
-    for(i=0;i<courseArray.length;i++){
-        courseElement = courseArray[i];
-        const course_name = courseElement["course_name"];
-        const course_id = courseElement["course_id"];
-        const department = courseElement["department"];
-        const elective = courseElement["elective"];
-        const semester_num = courseElement["semester_num"];
-        const L = courseElement["L"];
-        const T = courseElement["T"];
-        const P = courseElement["P"];
-        const C = courseElement["C"];
-        const faculties = courseElement["faculties"];
+    let p = new Promise((resolve, reject) => {
+        for (i = 0; i < courseArray.length; i++) {
+            counter = 0;
+            courseElement = courseArray[i];
+            const course_name = courseElement["course_name"];
+            const course_id = courseElement["course_id"];
+            const department = courseElement["department"];
+            const elective = courseElement["elective"];
+            const semester_num = courseElement["semester_num"];
+            const L = courseElement["L"];
+            const T = courseElement["T"];
+            const P = courseElement["P"];
+            const C = courseElement["C"];
+            const faculties = courseElement["faculties"];
 
-        const courses = new Course({ "course_name": course_name, "course_id": course_id, "department": department, "elective": elective, "semester_num": semester_num, "L":L, "T":T, "P":P, "C":C, "faculties": faculties});
-        // console.log(courses);
+            const courses = new Course({ "course_name": course_name, "course_id": course_id, "department": department, "elective": elective, "semester_num": semester_num, "L": L, "T": T, "P": P, "C": C, "faculties": faculties });
+            // console.log(courses);
 
-        courses.save()
-            // .then(() => res.json('course added!'))
-            // .catch(err => res.status(400).json('Error: ' + err));
+            courses.save()
+                .then(() => {
+                    counter++;
+                    return counter;
+                })
+                .then((counter) => {
+                    if (counter == courseArray.length - 1) {
+                        resolve();
+                    }
+                })
+                .catch((err) => {
+                    reject();
+                })
+        }
+    })
 
-    }
-    
+    p.then(() => {
+        res.json({
+            message: "successful"
+        })
+    }).catch(() => {
+        res.json({
+            message: "unsuccessful"
+        })
+    })
+
+
 });
 
 router.route('/getAllCourses').get((req, res) => {
-        Course.find()
-            .then(courses => res.json({"courses": courses}))
-            .catch(err => res.status(400).json('Error: ' + err))
+    Course.find()
+        .then(courses => res.json({ "courses": courses }))
+        .catch(err => res.status(400).json('Error: ' + err))
 });
 
 module.exports = router;

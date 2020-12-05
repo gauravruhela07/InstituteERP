@@ -16,11 +16,13 @@ export default class uploadStudentData extends Component {
         this.onClick = this.onClick.bind(this);
     };
 
-    componentDidMount(){
+    componentDidMount() {
+        // console.log("Inside compodidMou");
         axios.get('http://localhost:5000/student/getAllStudents')
             .then(res => {
                 var arr = res.data.arrayOfStudents;
-                if (arr.length>0){
+                console.log(arr);
+                if (arr.length > 0) {
                     this.setState({
                         arrayOfStudents: arr,
                         isStudentUpdated: 0
@@ -29,21 +31,23 @@ export default class uploadStudentData extends Component {
             })
     }
 
-    componentDidUpdate(){
-        if (this.state.isStudentUpdated===1){
-            axios.post('http://localhost:5000/student/insertStudent', {theArray: this.state.arrayOfStudents})
-            .then(res => {
-                if (String(res.data.message) === "Student Data Successfully Inserted") {
-                    console.log("Insertion Successful");
-                }
-                else if (String(res.data.message) === "Student Data Not Inserted") {
-                    console.log("Not Inserted");
-                }
-            })
-            .catch(err => console.log("Error"))
+    componentDidUpdate() {
+        if (this.state.isStudentUpdated === 1) {
+            // console.log("Inside compodidUpdate and if");
+            axios.post('http://localhost:5000/student/insertStudent', { theArray: this.state.arrayOfStudents })
+                .then(res => {
+                    if (String(res.data.message) === "successful") {
+                        console.log("Insertion Successful");
+                    }
+                    else if (String(res.data.message) === "unsuccessful") {
+                        console.log("Not Inserted");
+                    }
+                })
+                .catch(err => console.log("Error"))
         }
-        
-        
+        return;
+
+
         // var arrayOfRollNum = [];
         // var i;
         // for (i=0;i<this.state.arrayOfStudents.length;i++){
@@ -67,7 +71,7 @@ export default class uploadStudentData extends Component {
         //         })
         // }
         // console.log(arrayOfSemesters);
-        
+
     }
 
     readExcel(file) {

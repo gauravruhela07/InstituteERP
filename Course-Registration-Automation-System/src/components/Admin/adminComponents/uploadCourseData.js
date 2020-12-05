@@ -17,13 +17,13 @@ export default class uploadCourseData extends Component {
         this.onClick = this.onClick.bind(this);
     };
 
-    componentDidMount(){
+    componentDidMount() {
         axios.get('http://localhost:5000/course/getAllCourses')
             .then(res => {
                 var arr = res.data.courses;
-                console.log("Inside componentdidmount");
+                // console.log("Inside componentdidmount");
                 console.log(arr);
-                if (arr.length>0){
+                if (arr.length > 0) {
                     this.setState({
                         courseArray: arr,
                         isCourseUpdated: 0
@@ -32,28 +32,29 @@ export default class uploadCourseData extends Component {
             })
     }
 
-    componentDidUpdate(){
-        if (this.state.isCourseUpdated===1){
-            console.log("Inside componentdidupdate and if");
-            axios.post('http://localhost:5000/course/insertCourse', {theArray: this.state.courseArray})
-                .then(res => {
-                    if (String(res.data.message) === "Course Data Successfully Inserted") {
-                        console.log("Insertion Successful");
-                    }
-                    else if (String(res.data.message) === "Course Data Not Inserted") {
-                        console.log("Not Inserted");
-                    }
-                })
-                .catch(err => console.log("Error"))
-
-            axios.post('http://localhost:5000/teaches/addFacultyCou', {mapp: JSON.stringify(this.state.myMap)})
+    componentDidUpdate() {
+        if (this.state.isCourseUpdated === 1) {
+            // console.log("Inside componentdidupdate and if");
+            axios.post('http://localhost:5000/course/insertCourse', { theArray: this.state.courseArray })
                 .then(res => {
                     if (String(res.data.message) === "successful") {
-                        console.log("Insertion Successful");
+                        console.log("courses inserted Successful");
                     }
                     else if (String(res.data.message) === "unsuccessful") {
-                        console.log("Not Inserted");
+                        console.log("courses not Inserted");
                     }
+                })
+                .then(() => {
+                    axios.post('http://localhost:5000/teaches/addFacultyCou', { mapp: JSON.stringify(this.state.myMap) })
+                        .then(res => {
+                            if (String(res.data.message) === "successful") {
+                                console.log("teaches Insertion Successful");
+                            }
+                            else if (String(res.data.message) === "unsuccessful") {
+                                console.log("teaches Not Inserted");
+                            }
+                        })
+                        .catch(err => console.log(err))
                 })
                 .catch(err => console.log(err))
 
@@ -81,21 +82,21 @@ export default class uploadCourseData extends Component {
         });
 
         promise.then((theArray) => {
-            var map1 = {}; 
-            var i,j;  
-            for (i=0;i<theArray.length;i++){
-                if (theArray[i]["faculties"]===null)continue;
+            var map1 = {};
+            var i, j;
+            for (i = 0; i < theArray.length; i++) {
+                if (theArray[i]["faculties"] === null) continue;
                 var arrayOfFaculties = theArray[i]["faculties"].split(",");
-                for (j=0;j<arrayOfFaculties.length;j++){
+                for (j = 0; j < arrayOfFaculties.length; j++) {
                     var fac = arrayOfFaculties[j];
                     var facultyKey = fac.trim();
-                    if ((facultyKey in map1)===false){
-                        map1[facultyKey] = [{"course_id": theArray[i]["course_id"], "course_name": theArray[i]["course_name"]}];
+                    if ((facultyKey in map1) === false) {
+                        map1[facultyKey] = [{ "course_id": theArray[i]["course_id"], "course_name": theArray[i]["course_name"] }];
                     }
-                    else if ((facultyKey in map1)===true){
-                        map1[facultyKey].push({"course_id": theArray[i]["course_id"], "course_name": theArray[i]["course_name"]});
+                    else if ((facultyKey in map1) === true) {
+                        map1[facultyKey].push({ "course_id": theArray[i]["course_id"], "course_name": theArray[i]["course_name"] });
                     }
-                }   
+                }
             }
             // console.log("map1");
             // console.log(map1);

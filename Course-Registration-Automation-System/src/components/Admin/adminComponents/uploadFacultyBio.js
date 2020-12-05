@@ -8,7 +8,7 @@ export default class uploadFacultyBio extends Component {
         super(props);
 
         this.state = {
-            arrayOfFaculty : [],
+            arrayOfFaculty: [],
             isFacultyUpdated: 0
         }
 
@@ -16,12 +16,13 @@ export default class uploadFacultyBio extends Component {
         this.onClick = this.onClick.bind(this);
     };
 
-    componentDidMount(){
+    componentDidMount() {
+        // console.log("inside componentdidmount");
         axios.get('http://localhost:5000/faculty/getAllFaculty')
             .then(res => {
                 var arr = res.data.faculties;
-                // console.log(arr);
-                if (arr.length>0){
+                console.log(arr);
+                if (arr.length > 0) {
                     this.setState({
                         arrayOfFaculty: arr,
                         isFacultyUpdated: 0
@@ -31,20 +32,21 @@ export default class uploadFacultyBio extends Component {
     }
 
 
-    componentDidUpdate(){
-        if (this.state.isFacultyUpdated===1){
-            axios.post('http://localhost:5000/faculty/add', {theArray: this.state.arrayOfFaculty})
-            .then(res => {
-                if (String(res.data.message) === "successful") {
-                    console.log("Insertion Successful");
-                }
-                else if (String(res.data.message) === "unsuccessful") {
-                    console.log("Not Inserted");
-                }
-            })
-            .catch(err => console.log("Error"))
+    componentDidUpdate() {
+        if (this.state.isFacultyUpdated === 1) {
+            // console.log("inside componentdidupdate and if");
+            axios.post('http://localhost:5000/faculty/add', { theArray: this.state.arrayOfFaculty })
+                .then(res => {
+                    if (String(res.data.message) === "successful") {
+                        console.log("Insertion Successful");
+                    }
+                    else if (String(res.data.message) === "unsuccessful") {
+                        console.log("Not Inserted");
+                    }
+                })
+                .catch(err => console.log("Error"))
         }
-        
+
     }
 
 
@@ -105,7 +107,7 @@ export default class uploadFacultyBio extends Component {
                         </thead>
                         <tbody>
                             {this.state.arrayOfFaculty.map((faculty) => {
-                                if (faculty["Advisor"]==="yes"){
+                                if (faculty["Advisor"] === "yes") {
                                     return (
                                         <tr>
                                             <td>{faculty["name"]}</td>
@@ -120,7 +122,7 @@ export default class uploadFacultyBio extends Component {
                                         </tr>
                                     )
                                 }
-                                else if(faculty["Advisor"]==="no"){
+                                else if (faculty["Advisor"] === "no") {
                                     return (
                                         <tr>
                                             <td>{faculty["name"]}</td>
@@ -133,7 +135,7 @@ export default class uploadFacultyBio extends Component {
                                     )
 
                                 }
-                                else if(faculty["Advisor"].length>3){
+                                else if (faculty["Advisor"].length > 3) {
                                     var advisoryString = faculty["Advisor"];
                                     var arr = advisoryString.split(",");
                                     return (
@@ -150,7 +152,7 @@ export default class uploadFacultyBio extends Component {
                                         </tr>
                                     )
                                 }
-                                else if(faculty["Advisor"].length<3){
+                                else if (faculty["Advisor"].length < 3) {
                                     return (
                                         <tr>
                                             <td>{faculty["name"]}</td>
