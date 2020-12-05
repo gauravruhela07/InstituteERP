@@ -76,10 +76,12 @@ export default class StudentHome extends Component {
         return (
             <div>
                 <NavbarClass/>
+                <div className="container">
                 <h1>Welcome, {this.state.name}!</h1>
                 <h2>Roll Number: {this.state.roll_num}</h2>
                 <h2>Department: {this.state.department}</h2>
                 <h2>Email: {this.state.email}</h2>
+                </div>
             </div>
         )
     }
