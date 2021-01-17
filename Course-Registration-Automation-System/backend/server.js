@@ -4,7 +4,7 @@ const mongoose = require('mongoose');
 
 const app = express();
 
-var port = 5000;
+const port = process.env.PORT || 5000;
 
 app.use(cors()); // cors acts as middleware
 app.use(express.json()) // for parsing the sent and received json
@@ -26,15 +26,24 @@ app.use(express.json()) // for parsing the sent and received json
 
 
 //////////////////////////////////////////////Amber will connect using this
-mongoose.connect("mongodb://localhost:27017/course_registration", { useNewUrlParser: true, useUnifiedTopology: true, useCreateIndex: true }, (error) => {
-    if (!error) {
-        console.log("Connected");
-    }
-    else {
-        console.log("Not connected");
-    }
-});
+// mongoose.connect("mongodb://localhost:27017/course_registration", { useNewUrlParser: true, useUnifiedTopology: true, useCreateIndex: true }, (error) => {
+//     if (!error) {
+//         console.log("Connected");
+//     }
+//     else {
+//         console.log("Not connected");
+//     }
+// });
 //////////////////////////////////////////////
+
+
+const uri = "mongodb+srv://root:root@cluster0.hevkx.gcp.mongodb.net/course_registration?retryWrites=true&w=majority"
+mongoose.connect(uri, { useNewUrlParser: true, useUnifiedTopology: true, useCreateIndex: true });
+
+const connection = mongoose.connection;
+connection.once('open', () => {
+    console.log("MongoDB database connection established successfully");
+})
 
 
 
@@ -65,6 +74,15 @@ app.use('/student', student_Router);
 // app.use('/studentSub', studentSubject_Router);
 app.use('/teaches', teaches_Router);
 app.use('/fee', feeRouter);
+
+
+if (process.env.NODE_ENV === "production") {
+    app.use(express.static('../build'))
+    const path = require("path")
+    app.get("*", (req, res) => {
+        res.sendFile(path.resolve(__dirname, '../build', 'index.html'))
+    })
+}
 
 
 app.listen(port, () => {
