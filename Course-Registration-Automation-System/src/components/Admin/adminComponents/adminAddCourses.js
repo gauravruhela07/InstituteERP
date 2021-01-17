@@ -38,7 +38,7 @@ const AdminAddCourses = () => {
             department: department,
             elective: "-1"
         }
-        axios.post('http://localhost:5000/course/add/', course)
+        axios.post('/course/add/', course)
             .then(() => console.log("Course added"))
             .catch(err => console.log("Course not added Error found"));
 

@@ -18,7 +18,7 @@ export default class uploadStudentData extends Component {
 
     componentDidMount() {
         // console.log("inside componentdidmount");
-        axios.get('http://localhost:5000/fee/getAllFeeDetails')
+        axios.get('/fee/getAllFeeDetails')
             .then(result => {
                 var arr = result.data.arrayOfFees;
                 console.log(arr);
@@ -35,7 +35,7 @@ export default class uploadStudentData extends Component {
     componentDidUpdate(prevProps, prevState, snapShot) {
         if (this.state.isFeeUpdated === 1) {
             // console.log("inside componentdidupdate and if");
-            axios.post('http://localhost:5000/fee/addFinanceDeptFee', { theArray: this.state.arrayOfFee })
+            axios.post('/fee/addFinanceDeptFee', { theArray: this.state.arrayOfFee })
                 .then((result) => {
                     if (result.data.message === "successful") {
                         console.log("Insertion of fee successful")

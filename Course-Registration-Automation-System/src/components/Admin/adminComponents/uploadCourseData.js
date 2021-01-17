@@ -18,7 +18,7 @@ export default class uploadCourseData extends Component {
     };
 
     componentDidMount() {
-        axios.get('http://localhost:5000/course/getAllCourses')
+        axios.get('/course/getAllCourses')
             .then(res => {
                 var arr = res.data.courses;
                 // console.log("Inside componentdidmount");
@@ -35,7 +35,7 @@ export default class uploadCourseData extends Component {
     componentDidUpdate() {
         if (this.state.isCourseUpdated === 1) {
             // console.log("Inside componentdidupdate and if");
-            axios.post('http://localhost:5000/course/insertCourse', { theArray: this.state.courseArray })
+            axios.post('/course/insertCourse', { theArray: this.state.courseArray })
                 .then(res => {
                     if (String(res.data.message) === "successful") {
                         console.log("courses inserted Successful");
@@ -45,7 +45,7 @@ export default class uploadCourseData extends Component {
                     }
                 })
                 .then(() => {
-                    axios.post('http://localhost:5000/teaches/addFacultyCou', { mapp: JSON.stringify(this.state.myMap) })
+                    axios.post('/teaches/addFacultyCou', { mapp: JSON.stringify(this.state.myMap) })
                         .then(res => {
                             if (String(res.data.message) === "successful") {
                                 console.log("teaches Insertion Successful");

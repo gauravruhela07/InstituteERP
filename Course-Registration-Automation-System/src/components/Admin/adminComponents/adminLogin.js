@@ -43,7 +43,7 @@ export default class AdminLogin extends Component {
         e.preventDefault()
         const { loggedIn, adminId, adminPassword } = this.state;
 
-        axios.post('http://localhost:5000/adminCred/validate', { adminId, adminPassword })
+        axios.post('/adminCred/validate', { adminId, adminPassword })
             .then(res => {
                 if (String(res.data.message) === "Auth Successful") {
                     let token = "Putin " + res.data.token;

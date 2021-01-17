@@ -18,7 +18,7 @@ export default class uploadStudentData extends Component {
 
     componentDidMount() {
         // console.log("Inside compodidMou");
-        axios.get('http://localhost:5000/student/getAllStudents')
+        axios.get('/student/getAllStudents')
             .then(res => {
                 var arr = res.data.arrayOfStudents;
                 console.log(arr);
@@ -34,7 +34,7 @@ export default class uploadStudentData extends Component {
     componentDidUpdate() {
         if (this.state.isStudentUpdated === 1) {
             // console.log("Inside compodidUpdate and if");
-            axios.post('http://localhost:5000/student/insertStudent', { theArray: this.state.arrayOfStudents })
+            axios.post('/student/insertStudent', { theArray: this.state.arrayOfStudents })
                 .then(res => {
                     if (String(res.data.message) === "successful") {
                         console.log("Insertion Successful");

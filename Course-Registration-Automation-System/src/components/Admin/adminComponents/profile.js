@@ -27,7 +27,7 @@ const Profile = (props) => {
         //     loggedIn = false;
         // }
 
-        axios.post('http://localhost:5000/faculty/getAdmin', { adminId: adminId })
+        axios.post('/faculty/getAdmin', { adminId: adminId })
             .then(response => {
                 setName(response.data[0].name);
                 setfacultyId(response.data[0].faculty_id);
@@ -42,7 +42,7 @@ const Profile = (props) => {
         <div>
             <NavBarAfterLoginPage />
             <div>
-                <div className = "container">
+                <div className="container">
                     <h3>Welcome Admin</h3>
                     <table className="content-table">
                         <thead >

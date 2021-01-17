@@ -18,7 +18,7 @@ export default class uploadFacultyBio extends Component {
 
     componentDidMount() {
         // console.log("inside componentdidmount");
-        axios.get('http://localhost:5000/faculty/getAllFaculty')
+        axios.get('/faculty/getAllFaculty')
             .then(res => {
                 var arr = res.data.faculties;
                 console.log(arr);
@@ -35,7 +35,7 @@ export default class uploadFacultyBio extends Component {
     componentDidUpdate() {
         if (this.state.isFacultyUpdated === 1) {
             // console.log("inside componentdidupdate and if");
-            axios.post('http://localhost:5000/faculty/add', { theArray: this.state.arrayOfFaculty })
+            axios.post('/faculty/add', { theArray: this.state.arrayOfFaculty })
                 .then(res => {
                     if (String(res.data.message) === "successful") {
                         console.log("Insertion Successful");

@@ -13,7 +13,7 @@ router.route('/addFacultyCou').post((req, res) => {
         counter = 0;
         for (const faculty_name of Object.keys(mapp)) {
             // console.log(faculty_name);
-            axios.post('http://localhost:5000/faculty/getFacultyId', { faculty_name: faculty_name })
+            axios.post('/faculty/getFacultyId', { faculty_name: faculty_name })
                 .then(result => {
                     var name = result.data.name;
                     var faculty_id = String(result.data.faculty_id);
